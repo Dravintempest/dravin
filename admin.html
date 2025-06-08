@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Music Player</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+    :root {
+        --primary-color: #4a76a8;
+        --bg-color: #f5f5f5;
+        --text-color: #333;
+        --card-bg: #fff;
+        --error-color: #e74c3c;
+        --success-color: #2ecc71;
+        --warning-color: #f39c12;
+    }
+
+    .dark-mode {
+        --primary-color: #6b9bd2;
+        --bg-color: #121212;
+        --text-color: #f5f5f5;
+        --card-bg: #1e1e1e;
+    }
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        transition: background-color 0.3s, color 0.3s;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+        line-height: 1.6;
+        padding: 20px;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    h1 {
+        color: var(--primary-color);
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+    .login-container, .admin-container {
+        background-color: var(--card-bg);
+        border-radius: 15px;
+        padding: 30px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        max-width: 500px;
+        margin: 0 auto;
+    }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: bold;
+    }
+
+    input[type="text"],
+    input[type="password"],
+    input[type="date"],
+    input[type="url"] {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 1rem;
+        background-color: var(--bg-color);
+        color: var(--text-color);
+    }
+
+    button {
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1rem;
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    button:hover {
+        opacity: 0.9;
+    }
+
+    .error-message {
+        color: var(--error-color);
+        margin-top: 5px;
+        font-size: 0.9rem;
+    }
+
+    .success-message {
+        color: var(--success-color);
+        margin-top: 5px;
+        font-size: 0.9rem;
+    }
+
+    .back-btn {
+        background-color: #777;
+        margin-top: 20px;
+    }
+
+    .logout-btn {
+        background-color: var(--error-color);
+        margin-top: 10px;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    .songs-list {
+        margin-top: 20px;
+        max-height: 300px;
+        overflow-y: auto;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        padding: 10px;
+    }
+
+    .song-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        border-bottom: 1px solid #ddd;
+    }
+
+    .song-item:last-child {
+        border-bottom: none;
+    }
+
+    .song-info {
+        flex: 1;
+    }
+
+    .song-title {
+        font-weight: bold;
+    }
+
+    .song-artist {
+        font-size: 0.8rem;
+        color: #777;
+    }
+
+    .action-btn {
+        color: white;
+        border: none;
+        padding: 5px 10px;
+        border-radius: 3px;
+        cursor: pointer;
+        font-size: 0.8rem;
+        margin-left: 5px;
+    }
+
+    .delete-btn {
+        background-color: var(--error-color);
+    }
+
+    .edit-btn {
+        background-color: var(--warning-color);
+    }
+
+    .delete-btn:hover, .edit-btn:hover {
+        opacity: 0.8;
+    }
+
+    .admin-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .admin-actions button {
+        margin-top: 0;
+        width: auto;
+        flex: 1;
+    }
+
+    .theme-toggle {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            z-index: 100;
+        }
+
+    .loading {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 2px solid rgba(255,255,255,.3);
+        border-radius: 50%;
+        border-top-color: #fff;
+        animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+</style>
+</head>
+<body>
+    <button class="theme-toggle" id="themeToggle">
+        <i class="fas fa-moon"></i> Dark Mode
+    </button>
+
+    <h1>Admin Panel</h1>
+    
+    <div id="loginContainer" class="login-container">
+        <div class="form-group">
+            <label for="adminPassword">Admin Password</label>
+            <input type="password" id="adminPassword" placeholder="Enter admin password">
+            <p id="loginError" class="error-message hidden">Incorrect password</p>
+        </div>
+        <button id="loginBtn">Login</button>
+    </div>
+
+    <div id="adminContainer" class="admin-container hidden">
+        <div class="admin-actions">
+            <button id="addNewBtn"><i class="fas fa-plus"></i> Add New</button>
+            <button id="manageSongsBtn"><i class="fas fa-music"></i> Manage Songs</button>
+            <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        </div>
+
+        <div id="addSongSection">
+            <h2>Add New Song</h2>
+            <div class="form-group">
+                <label for="songTitle">Song Title</label>
+                <input type="text" id="songTitle" placeholder="Enter song title">
+            </div>
+            <div class="form-group">
+                <label for="songArtist">Artist</label>
+                <input type="text" id="songArtist" placeholder="Enter artist name">
+            </div>
+            <div class="form-group">
+                <label for="songReleaseDate">Release Date</label>
+                <input type="date" id="songReleaseDate">
+            </div>
+            <div class="form-group">
+                <label for="songMp3">MP3 URL</label>
+                <div style="display: flex; gap: 10px;">
+                    <input type="url" id="songMp3" placeholder="Enter MP3 file URL" style="flex: 1;">
+                    <button id="getDurationBtn" style="width: auto; padding: 0 15px;">
+                        <i class="fas fa-clock"></i> Get Duration
+                    </button>
+                </div>
+                <div id="durationLoading" class="hidden" style="margin-top: 5px;">
+                    <div class="loading"></div> <span>Getting duration...</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="songThumbnail">Thumbnail URL</label>
+                <input type="url" id="songThumbnail" placeholder="Enter thumbnail image URL">
+            </div>
+            <div class="form-group">
+                <label for="songDuration">Duration (MM:SS)</label>
+                <input type="text" id="songDuration" placeholder="e.g. 3:29" readonly>
+            </div>
+            <button id="addSongBtn">Add Song</button>
+            <p id="successMessage" class="success-message hidden">Song added successfully!</p>
+            <button class="back-btn" id="backBtn">Back to Player</button>
+        </div>
+
+        <div id="manageSongsSection" class="hidden">
+            <h2>Manage Songs</h2>
+            <div class="songs-list" id="songsList">
+                <!-- Song items will be added here by JavaScript -->
+            </div>
+            <button class="back-btn" id="backToAddBtn"><i class="fas fa-arrow-left"></i> Back to Add Song</button>
+        </div>
+
+        <div id="editSongSection" class="hidden">
+            <h2>Edit Song</h2>
+            <input type="hidden" id="editSongIndex">
+            <div class="form-group">
+                <label for="editSongTitle">Song Title</label>
+                <input type="text" id="editSongTitle" placeholder="Enter song title">
+            </div>
+            <div class="form-group">
+                <label for="editSongArtist">Artist</label>
+                <input type="text" id="editSongArtist" placeholder="Enter artist name">
+            </div>
+            <div class="form-group">
+                <label for="editSongReleaseDate">Release Date</label>
+                <input type="date" id="editSongReleaseDate">
+            </div>
+            <div class="form-group">
+                <label for="editSongMp3">MP3 URL</label>
+                <div style="display: flex; gap: 10px;">
+                    <input type="url" id="editSongMp3" placeholder="Enter MP3 file URL" style="flex: 1;">
+                    <button id="editGetDurationBtn" style="width: auto; padding: 0 15px;">
+                        <i class="fas fa-clock"></i> Get Duration
+                    </button>
+                </div>
+                <div id="editDurationLoading" class="hidden" style="margin-top: 5px;">
+                    <div class="loading"></div> <span>Getting duration...</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="editSongThumbnail">Thumbnail URL</label>
+                <input type="url" id="editSongThumbnail" placeholder="Enter thumbnail image URL">
+            </div>
+            <div class="form-group">
+                <label for="editSongDuration">Duration (MM:SS)</label>
+                <input type="text" id="editSongDuration" placeholder="e.g. 3:29" readonly>
+            </div>
+            <button id="saveEditBtn">Save Changes</button>
+            <button class="back-btn" id="cancelEditBtn">Cancel</button>
+            <p id="editSuccessMessage" class="success-message hidden">Song updated successfully!</p>
+        </div>
+    </div>
+
+    <script>
+        // Admin password
+        const ADMIN_PASSWORD = "admindravingantengsekali";
+        
+        // DOM elements
+        const loginContainer = document.getElementById('loginContainer');
+        const adminContainer = document.getElementById('adminContainer');
+        const adminPassword = document.getElementById('adminPassword');
+        const loginBtn = document.getElementById('loginBtn');
+        const loginError = document.getElementById('loginError');
+        const addSongBtn = document.getElementById('addSongBtn');
+        const backBtn = document.getElementById('backBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const successMessage = document.getElementById('successMessage');
+        const addSongSection = document.getElementById('addSongSection');
+        const manageSongsSection = document.getElementById('manageSongsSection');
+        const editSongSection = document.getElementById('editSongSection');
+        const addNewBtn = document.getElementById('addNewBtn');
+        const manageSongsBtn = document.getElementById('manageSongsBtn');
+        const backToAddBtn = document.getElementById('backToAddBtn');
+        const songsList = document.getElementById('songsList');
+        const themeToggle = document.getElementById('themeToggle');
+        const getDurationBtn = document.getElementById('getDurationBtn');
+        const durationLoading = document.getElementById('durationLoading');
+        const songDuration = document.getElementById('songDuration');
+        const editGetDurationBtn = document.getElementById('editGetDurationBtn');
+        const editDurationLoading = document.getElementById('editDurationLoading');
+        const editSongDuration = document.getElementById('editSongDuration');
+
+        // Edit form elements
+        const editSongIndex = document.getElementById('editSongIndex');
+        const editSongTitle = document.getElementById('editSongTitle');
+        const editSongArtist = document.getElementById('editSongArtist');
+        const editSongReleaseDate = document.getElementById('editSongReleaseDate');
+        const editSongMp3 = document.getElementById('editSongMp3');
+        const editSongThumbnail = document.getElementById('editSongThumbnail');
+        const saveEditBtn = document.getElementById('saveEditBtn');
+        const cancelEditBtn = document.getElementById('cancelEditBtn');
+        const editSuccessMessage = document.getElementById('editSuccessMessage');
+
+        // Check if user is logged in
+        const isLoggedIn = localStorage.getItem('adminLoggedIn') === 'true';
+
+        // Check theme preference
+        function checkThemePreference() {
+            const darkMode = localStorage.getItem('darkMode') === 'true';
+            if (darkMode) {
+                document.body.classList.add('dark-mode');
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+            } else {
+                themeToggle.innerHTML = '<i class="fas fa-moon"></i>';
+            }
+        }
+
+        // Toggle theme
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDarkMode);
+            themeToggle.innerHTML = isDarkMode 
+                ? '<i class="fas fa-sun"></i>' 
+                : '<i class="fas fa-moon"></i>';
+        }
+
+        // Initialize
+        checkThemePreference();
+
+        if (isLoggedIn) {
+            loginContainer.classList.add('hidden');
+            adminContainer.classList.remove('hidden');
+            loadSongsList();
+        }
+
+        // Login button click
+        loginBtn.addEventListener('click', () => {
+            if (adminPassword.value === ADMIN_PASSWORD) {
+                localStorage.setItem('adminLoggedIn', 'true');
+                loginContainer.classList.add('hidden');
+                adminContainer.classList.remove('hidden');
+                loginError.classList.add('hidden');
+                loadSongsList();
+            } else {
+                loginError.classList.remove('hidden');
+            }
+        });
+
+        // Logout button click
+        logoutBtn.addEventListener('click', () => {
+            localStorage.removeItem('adminLoggedIn');
+            adminContainer.classList.add('hidden');
+            loginContainer.classList.remove('hidden');
+            adminPassword.value = '';
+        });
+
+        // Theme toggle
+        themeToggle.addEventListener('click', toggleTheme);
+
+        // Get duration from MP3
+        async function getDuration(url, loadingElement, durationField) {
+            if (!url) {
+                alert('Please enter MP3 URL first');
+                return;
+            }
+
+            loadingElement.classList.remove('hidden');
+            
+            try {
+                const audio = new Audio();
+                audio.src = url;
+                
+                // Wait for metadata to load
+                await new Promise((resolve, reject) => {
+                    audio.addEventListener('loadedmetadata', () => {
+                        const duration = audio.duration;
+                        if (duration && !isNaN(duration)) {
+                            const minutes = Math.floor(duration / 60);
+                            const seconds = Math.floor(duration % 60);
+                            const formattedDuration = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                            durationField.value = formattedDuration;
+                            resolve();
+                        } else {
+                            reject('Could not get duration');
+                        }
+                    });
+                    
+                    audio.addEventListener('error', () => {
+                        reject('Error loading audio');
+                    });
+                    
+                    // Timeout if metadata takes too long to load
+                    setTimeout(() => {
+                        reject('Timeout loading audio');
+                    }, 10000);
+                });
+            } catch (error) {
+                alert('Error getting duration: ' + error);
+            } finally {
+                loadingElement.classList.add('hidden');
+            }
+        }
+
+        // Get duration for new song
+        getDurationBtn.addEventListener('click', () => {
+            const url = document.getElementById('songMp3').value;
+            getDuration(url, durationLoading, songDuration);
+        });
+
+        // Get duration for edit song
+        editGetDurationBtn.addEventListener('click', () => {
+            const url = editSongMp3.value;
+            getDuration(url, editDurationLoading, editSongDuration);
+        });
+
+        // Add song button click
+        addSongBtn.addEventListener('click', () => {
+            // Validate form
+            if (!songTitle.value || !songArtist.value || !songReleaseDate.value || 
+                !songMp3.value || !songThumbnail.value || !songDuration.value) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            // Create new song object
+            const newSong = {
+                title: songTitle.value,
+                artist: songArtist.value,
+                mp3: songMp3.value,
+                thumbnail: songThumbnail.value,
+                releaseDate: songReleaseDate.value,
+                duration: songDuration.value
+            };
+
+            // Get existing songs from localStorage or create empty array
+            let songs = JSON.parse(localStorage.getItem('musicPlayerSongs')) || [];
+
+            // Add new song
+            songs.push(newSong);
+
+            // Save back to localStorage
+            localStorage.setItem('musicPlayerSongs', JSON.stringify(songs));
+
+            // Show success message
+            successMessage.classList.remove('hidden');
+            setTimeout(() => {
+                successMessage.classList.add('hidden');
+            }, 3000);
+
+            // Clear form
+            songTitle.value = '';
+            songArtist.value = '';
+            songReleaseDate.value = '';
+            songMp3.value = '';
+            songThumbnail.value = '';
+            songDuration.value = '';
+
+            // Update songs list
+            loadSongsList();
+        });
+
+        // Load songs list for management
+        function loadSongsList() {
+            songsList.innerHTML = '';
+            const songs = JSON.parse(localStorage.getItem('musicPlayerSongs')) || [];
+            
+            if (songs.length === 0) {
+                songsList.innerHTML = '<p>No songs available. Add some songs first.</p>';
+                return;
+            }
+
+            songs.forEach((song, index) => {
+                const songItem = document.createElement('div');
+                songItem.className = 'song-item';
+                songItem.innerHTML = `
+                    <div class="song-info">
+                        <div class="song-title">${song.title}</div>
+                        <div class="song-artist">${song.artist} • ${song.duration}</div>
+                    </div>
+                    <div>
+                        <button class="action-btn edit-btn" data-index="${index}">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="action-btn delete-btn" data-index="${index}">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </div>
+                `;
+                songsList.appendChild(songItem);
+            });
+
+            // Add event listeners to delete buttons
+            document.querySelectorAll('.delete-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const index = e.target.getAttribute('data-index') || 
+                                 e.target.parentElement.getAttribute('data-index');
+                    deleteSong(index);
+                });
+            });
+
+            // Add event listeners to edit buttons
+            document.querySelectorAll('.edit-btn').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const index = e.target.getAttribute('data-index') || 
+                                 e.target.parentElement.getAttribute('data-index');
+                    editSong(index);
+                });
+            });
+        }
+
+        // Delete a song
+        function deleteSong(index) {
+            if (confirm('Are you sure you want to delete this song?')) {
+                let songs = JSON.parse(localStorage.getItem('musicPlayerSongs')) || [];
+                songs.splice(index, 1);
+                localStorage.setItem('musicPlayerSongs', JSON.stringify(songs));
+                loadSongsList();
+                
+                // Show temporary success message
+                const msg = document.createElement('div');
+                msg.className = 'success-message';
+                msg.textContent = 'Song deleted successfully!';
+                songsList.prepend(msg);
+                setTimeout(() => msg.remove(), 3000);
+            }
+        }
+
+        // Edit a song
+        function editSong(index) {
+            const songs = JSON.parse(localStorage.getItem('musicPlayerSongs')) || [];
+            const song = songs[index];
+            
+            // Fill edit form
+            editSongIndex.value = index;
+            editSongTitle.value = song.title;
+            editSongArtist.value = song.artist;
+            editSongReleaseDate.value = song.releaseDate;
+            editSongMp3.value = song.mp3;
+            editSongThumbnail.value = song.thumbnail;
+            editSongDuration.value = song.duration;
+            
+            // Show edit section
+            manageSongsSection.classList.add('hidden');
+            editSongSection.classList.remove('hidden');
+        }
+
+        // Save edited song
+        saveEditBtn.addEventListener('click', () => {
+            const index = editSongIndex.value;
+            if (!index) return;
+
+            // Validate form
+            if (!editSongTitle.value || !editSongArtist.value || !editSongReleaseDate.value || 
+                !editSongMp3.value || !editSongThumbnail.value || !editSongDuration.value) {
+                alert('Please fill in all fields');
+                return;
+            }
+
+            const songs = JSON.parse(localStorage.getItem('musicPlayerSongs')) || [];
+            
+            // Update song
+            songs[index] = {
+                title: editSongTitle.value,
+                artist: editSongArtist.value,
+                mp3: editSongMp3.value,
+                thumbnail: editSongThumbnail.value,
+                releaseDate: editSongReleaseDate.value,
+                duration: editSongDuration.value
+            };
+
+            // Save back to localStorage
+            localStorage.setItem('musicPlayerSongs', JSON.stringify(songs));
+
+            // Show success message
+            editSuccessMessage.classList.remove('hidden');
+            setTimeout(() => {
+                editSuccessMessage.classList.add('hidden');
+            }, 3000);
+
+            // Go back to manage songs
+            editSongSection.classList.add('hidden');
+            manageSongsSection.classList.remove('hidden');
+            loadSongsList();
+        });
+
+        // Cancel edit
+        cancelEditBtn.addEventListener('click', () => {
+            editSongSection.classList.add('hidden');
+            manageSongsSection.classList.remove('hidden');
+        });
+
+        // Navigation between sections
+        addNewBtn.addEventListener('click', () => {
+            manageSongsSection.classList.add('hidden');
+            editSongSection.classList.add('hidden');
+            addSongSection.classList.remove('hidden');
+        });
+
+        manageSongsBtn.addEventListener('click', () => {
+            addSongSection.classList.add('hidden');
+            editSongSection.classList.add('hidden');
+            manageSongsSection.classList.remove('hidden');
+            loadSongsList();
+        });
+
+        backToAddBtn.addEventListener('click', () => {
+            manageSongsSection.classList.add('hidden');
+            editSongSection.classList.add('hidden');
+            addSongSection.classList.remove('hidden');
+        });
+
+        // Back button click
+        backBtn.addEventListener('click', () => {
+            window.location.href = 'index.html';
+        });
+
+        // Allow pressing Enter to login
+        adminPassword.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                loginBtn.click();
+            }
+        });
+    </script>
+</body>
+</html>
