@@ -7,6 +7,7 @@
     <link rel="icon" type="image/png" href="favicon.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        /* CSS kamu yang sudah ada, tidak ada perubahan di sini */
         :root {
     --primary-color: #4a76a8;
     --bg-color: #f5f5f5;
@@ -436,7 +437,7 @@ h1 {
                 <i class="fas fa-user-cog"></i> Admin
             </button>
             <button class="theme-toggle" id="themeToggle">
-                <i class="fas fa-moon"></i>Dark  Mode
+                <i class="fas fa-moon"></i>Dark Mode
             </button>
         </div>
     </header>
@@ -501,33 +502,7 @@ h1 {
     <audio id="audioPlayer"></audio>
 
     <script>
-        // Music data array (loaded from localStorage or default)
-        let songs = JSON.parse(localStorage.getItem('musicPlayerSongs')) || [
-            {
-                title: "Golden Hour",
-                artist: "JVKE",
-                mp3: "https://files.catbox.moe/9a7kkk.mp3",
-                thumbnail: "https://i.scdn.co/image/ab67616d0000b2730af4476af141051c728ee8b9",
-                releaseDate: "2022-10-03",
-                duration: "3:29"
-            },
-            {
-                title: "Littleroot Town",
-                artist: "Pokemon",
-                mp3: "https://files.catbox.moe/7bzwfz.mp3",
-                thumbnail: "https://files.catbox.moe/5g3j1a.jpg",
-                releaseDate: "2019-11-29",
-                duration: "3:20"
-            },
-            {
-                title: "Stay",
-                artist: "The Kid LAROI, Justin Bieber",
-                mp3: "https://files.catbox.moe/5x8j2k.mp3",
-                thumbnail: "https://i.scdn.co/image/ab67616d0000b273c5653f9038e42efad2f8a266",
-                releaseDate: "2021-07-09",
-                duration: "2:21"
-            }
-        ];
+        let songs = []; // Inisialisasi kosong, nanti akan diisi dari songs.json
 
         // DOM elements
         const audioPlayer = document.getElementById('audioPlayer');
@@ -557,23 +532,38 @@ h1 {
         let isLooping = false;
 
         // Initialize player
-        function initPlayer() {
-            loadPlaylist();
+        async function initPlayer() {
+            await loadSongsFromJSON(); // Tunggu hingga lagu dimuat
             updateThemeToggle();
         }
 
-        // Load playlist from localStorage
-        function loadPlaylist() {
-            const savedSongs = JSON.parse(localStorage.getItem('musicPlayerSongs'));
-            
-            if (savedSongs && savedSongs.length > 0) {
-                songs = savedSongs;
-            }
-            
-            renderPlaylist();
-            
-            if (songs.length > 0 && !audioPlayer.src) {
-                loadSong(0);
+        // Load songs from songs.json
+        async function loadSongsFromJSON() {
+            try {
+                const response = await fetch('songs.json?v=' + new Date().getTime()); // Tambahkan cache-busting
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                songs = await response.json();
+                
+                if (songs.length === 0) {
+                    console.warn("songs.json is empty or invalid.");
+                    // Opsional: Tampilkan pesan ke user bahwa tidak ada lagu
+                    musicListContainer.innerHTML = '<p style="text-align: center; color: var(--text-color);">Tidak ada lagu yang ditemukan.</p>';
+                    return;
+                }
+
+                renderPlaylist();
+                if (songs.length > 0) {
+                    // Pastikan currentSongIndex valid
+                    if (currentSongIndex >= songs.length) {
+                        currentSongIndex = 0; // Reset jika index melebihi jumlah lagu
+                    }
+                    loadSong(currentSongIndex);
+                }
+            } catch (error) {
+                console.error("Failed to load songs from songs.json:", error);
+                musicListContainer.innerHTML = '<p style="text-align: center; color: var(--error-color);">Gagal memuat daftar lagu. Silakan coba lagi nanti.</p>';
             }
         }
 
@@ -589,7 +579,9 @@ h1 {
             // Update active song in playlist
             const musicItems = document.querySelectorAll('.music-item');
             musicItems.forEach(item => item.classList.remove('active'));
-            musicItems[index].classList.add('active');
+            if (musicItems[index]) {
+                musicItems[index].classList.add('active');
+            }
         }
 
         // Render playlist
@@ -728,13 +720,16 @@ h1 {
                 const items = document.querySelectorAll('.music-item');
                 
                 items.forEach((item, index) => {
-                    const title = songs[index].title.toLowerCase();
-                    const artist = songs[index].artist.toLowerCase();
-                    
-                    if (title.includes(searchTerm) || artist.includes(searchTerm)) {
-                        item.style.display = 'grid';
-                    } else {
-                        item.style.display = 'none';
+                    // Pastikan index valid dan songs sudah dimuat
+                    if (songs[index]) { 
+                        const title = songs[index].title.toLowerCase();
+                        const artist = songs[index].artist.toLowerCase();
+                        
+                        if (title.includes(searchTerm) || artist.includes(searchTerm)) {
+                            item.style.display = 'grid';
+                        } else {
+                            item.style.display = 'none';
+                        }
                     }
                 });
             });
@@ -778,16 +773,16 @@ h1 {
             window.location.href = 'admin.html';
         });
 
-        // Handle storage events for real-time updates
-        window.addEventListener('storage', function(event) {
-            if (event.key === 'musicPlayerSongs') {
-                loadPlaylist();
-            }
-        });
+        // Hapus event listener storage karena kita tidak lagi bergantung pada localStorage untuk lagu
+        // window.addEventListener('storage', function(event) {
+        //     if (event.key === 'musicPlayerSongs') {
+        //         loadPlaylist();
+        //     }
+        // });
 
         // Initialize
         checkThemePreference();
-        initPlayer();
+        initPlayer(); // Panggil initPlayer untuk memuat lagu dari JSON
         setupSearch();
     </script>
 </body>
