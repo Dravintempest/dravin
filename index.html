@@ -106,8 +106,8 @@ h1 {
     transition: transform 0.4s cubic-bezier(0.65, 0, 0.35, 1);
 }
 
-.theme-toggle:hover::before, 
-.request-btn:hover::before, 
+.theme-toggle:hover::before,
+.request-btn:hover::before,
 .admin-btn:hover::before {
     transform: scaleX(1);
     transform-origin: left;
@@ -131,7 +131,7 @@ h1 {
     transition: all 0.3s ease;
 }
 
-.theme-toggle:hover i, .request-btn:hover i, .admin-btn:hover i {
+.theme-toggle:hover i, .request-btn:hover i {
     transform: scale(1.1);
 }
 
@@ -146,14 +146,7 @@ h1 {
     animation: musicNote 0.6s ease infinite;
 }
 
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-.admin-btn:hover i {
-    animation: spin 2.5s linear infinite;
-}
+/* Removed spin animation for admin-btn:hover i */
 
 @keyframes pulse {
     0% { transform: scale(1); }
@@ -436,13 +429,13 @@ h1 {
         <h1>Music Player</h1>
         <div>
             <button class="request-btn" id="requestBtn">
-                <i class="fas fa-music"></i> Request Song
+                <i class="fas fa-music"></i> Request
             </button>
             <button class="admin-btn" id="adminBtn">
                 <i class="fas fa-user-cog"></i> Admin
             </button>
             <button class="theme-toggle" id="themeToggle">
-                <i class="fas fa-moon"></i> Dark Mode
+                <i class="fas fa-moon"></i>Dark  Mode
             </button>
         </div>
     </header>
@@ -500,8 +493,7 @@ h1 {
                 <div class="header-item">Durasi</div>
             </div>
             <div id="musicListContainer">
-                <!-- Daftar musik akan diisi oleh JavaScript -->
-            </div>
+                </div>
         </div>
     </div>
 
