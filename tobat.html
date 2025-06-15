@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Day Counter - Tobat Tracker</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f5f5f5;
+            color: #333;
+            text-align: center;
+        }
+        
+        .container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            width: 80%;
+            max-width: 400px;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        
+        .day-counter {
+            font-size: 5rem;
+            font-weight: bold;
+            color: #3498db;
+            margin: 20px 0;
+        }
+        
+        .message {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            color: #7f8c8d;
+        }
+        
+        .reset-btn {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            font-size: 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .reset-btn:hover {
+            background-color: #c0392b;
+        }
+        
+        .confirmation {
+            display: none;
+            margin-top: 20px;
+        }
+        
+        .confirmation-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .confirmation-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        .confirm {
+            background-color: #e74c3c;
+            color: white;
+        }
+        
+        .cancel {
+            background-color: #bdc3c7;
+            color: #333;
+        }
+        
+        .history {
+            margin-top: 30px;
+            font-size: 0.9rem;
+            color: #95a5a6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Tobat Tracker</h1>
+        <div class="message">You've been strong for</div>
+        <div class="day-counter">Day 1</div>
+        <div class="message">Keep up the good work!</div>
+        
+        <button class="reset-btn" id="resetBtn">I Failed</button>
+        
+        <div class="confirmation" id="confirmation">
+            <p>Are you sure you want to reset your progress?</p>
+            <div class="confirmation-buttons">
+                <button class="confirmation-btn confirm" id="confirmReset">Yes, Reset</button>
+                <button class="confirmation-btn cancel" id="cancelReset">Cancel</button>
+            </div>
+        </div>
+        
+        <div class="history">
+            <p>Longest streak: <span id="longestStreak">1</span> days</p>
+            <p>Last reset: <span id="lastReset">Never</span></p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get DOM elements
+            const dayCounter = document.querySelector('.day-counter');
+            const resetBtn = document.getElementById('resetBtn');
+            const confirmation = document.getElementById('confirmation');
+            const confirmReset = document.getElementById('confirmReset');
+            const cancelReset = document.getElementById('cancelReset');
+            const longestStreakEl = document.getElementById('longestStreak');
+            const lastResetEl = document.getElementById('lastReset');
+            
+            // Initialize data from localStorage or default values
+            let data = JSON.parse(localStorage.getItem('tobatData')) || {
+                currentDay: 1,
+                lastDate: new Date().toDateString(),
+                longestStreak: 1,
+                lastReset: null
+            };
+            
+            // Check if a new day has passed
+            const today = new Date().toDateString();
+            if (today !== data.lastDate) {
+                // Check if it's the next day (not just a different day)
+                const lastDate = new Date(data.lastDate);
+                const currentDate = new Date();
+                
+                // If it's exactly one day later, increment the counter
+                if (currentDate.setHours(0,0,0,0) - lastDate.setHours(0,0,0,0) === 86400000) {
+                    data.currentDay++;
+                    data.lastDate = today;
+                    
+                    // Update longest streak if current is higher
+                    if (data.currentDay > data.longestStreak) {
+                        data.longestStreak = data.currentDay;
+                    }
+                    
+                    saveData();
+                }
+            }
+            
+            // Update the UI with current data
+            updateDisplay();
+            
+            // Reset button click handler
+            resetBtn.addEventListener('click', function() {
+                confirmation.style.display = 'block';
+                resetBtn.style.display = 'none';
+            });
+            
+            // Cancel reset handler
+            cancelReset.addEventListener('click', function() {
+                confirmation.style.display = 'none';
+                resetBtn.style.display = 'block';
+            });
+            
+            // Confirm reset handler
+            confirmReset.addEventListener('click', function() {
+                data.lastReset = new Date().toLocaleString();
+                data.currentDay = 1;
+                data.lastDate = new Date().toDateString();
+                saveData();
+                updateDisplay();
+                
+                confirmation.style.display = 'none';
+                resetBtn.style.display = 'block';
+            });
+            
+            // Save data to localStorage
+            function saveData() {
+                localStorage.setItem('tobatData', JSON.stringify(data));
+            }
+            
+            // Update the display with current data
+            function updateDisplay() {
+                dayCounter.textContent = `Day ${data.currentDay}`;
+                longestStreakEl.textContent = data.longestStreak;
+                lastResetEl.textContent = data.lastReset || 'Never';
+                
+                // Update message based on day count
+                const message = document.querySelectorAll('.message');
+                if (data.currentDay === 1) {
+                    message[1].textContent = "You can do this!";
+                } else if (data.currentDay < 7) {
+                    message[1].textContent = "Keep up the good work!";
+                } else if (data.currentDay < 30) {
+                    message[1].textContent = "You're doing great!";
+                } else {
+                    message[1].textContent = "Amazing commitment!";
+                }
+            }
+        });
+    </script>
+</body>
+</html>
