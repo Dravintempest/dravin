@@ -1,86 +1,132 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Day Counter - Tobat Tracker</title>
+    <title>Penghitung Hari Tobat</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --bg-color: #f5f5f5;
+            --text-color: #333;
+            --container-bg: #ffffff;
+            --primary-color: #3498db;
+            --reset-btn: #e74c3c;
+            --reset-btn-hover: #c0392b;
+            --shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .dark-mode {
+            --bg-color: #1a1a1a;
+            --text-color: #f0f0f0;
+            --container-bg: #2d2d2d;
+            --primary-color: #4da6ff;
+            --reset-btn: #ff6b6b;
+            --reset-btn-hover: #ff5252;
+            --shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Poppins', sans-serif;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             margin: 0;
-            background-color: #f5f5f5;
-            color: #333;
+            background-color: var(--bg-color);
+            color: var(--text-color);
             text-align: center;
+            transition: all 0.3s ease;
         }
         
         .container {
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            padding: 30px;
-            width: 80%;
-            max-width: 400px;
+            background-color: var(--container-bg);
+            border-radius: 15px;
+            box-shadow: var(--shadow);
+            padding: 2rem;
+            width: 90%;
+            max-width: 450px;
+            margin: 1rem;
+            transition: all 0.3s ease;
         }
         
         h1 {
-            color: #2c3e50;
-            margin-bottom: 20px;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            font-weight: 700;
         }
         
         .day-counter {
             font-size: 5rem;
-            font-weight: bold;
-            color: #3498db;
-            margin: 20px 0;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin: 1.5rem 0;
+            font-family: 'Poppins', sans-serif;
         }
         
         .message {
             font-size: 1.2rem;
-            margin-bottom: 30px;
-            color: #7f8c8d;
+            margin-bottom: 1.5rem;
+            color: var(--text-color);
+            opacity: 0.8;
+        }
+        
+        .button-container {
+            display: flex;
+            justify-content: center;
+            margin: 1.5rem 0;
         }
         
         .reset-btn {
-            background-color: #e74c3c;
+            background-color: var(--reset-btn);
             color: white;
             border: none;
             padding: 12px 24px;
             font-size: 1rem;
-            border-radius: 5px;
+            border-radius: 50px;
             cursor: pointer;
-            transition: background-color 0.3s;
+            transition: all 0.3s;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         
         .reset-btn:hover {
-            background-color: #c0392b;
+            background-color: var(--reset-btn-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
         }
         
         .confirmation {
             display: none;
-            margin-top: 20px;
+            margin-top: 1.5rem;
+            animation: fadeIn 0.3s;
+        }
+        
+        .confirmation p {
+            margin-bottom: 1rem;
         }
         
         .confirmation-buttons {
             display: flex;
             justify-content: center;
             gap: 10px;
-            margin-top: 10px;
         }
         
         .confirmation-btn {
             padding: 8px 16px;
             border: none;
-            border-radius: 5px;
+            border-radius: 50px;
             cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            transition: all 0.2s;
         }
         
         .confirm {
-            background-color: #e74c3c;
+            background-color: var(--reset-btn);
             color: white;
         }
         
@@ -90,38 +136,84 @@
         }
         
         .history {
-            margin-top: 30px;
+            margin-top: 2rem;
             font-size: 0.9rem;
-            color: #95a5a6;
+            color: var(--text-color);
+            opacity: 0.7;
+        }
+        
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-color);
+            opacity: 0.7;
+            transition: all 0.3s;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+        
+        .theme-toggle:hover {
+            opacity: 1;
+            background-color: rgba(0,0,0,0.1);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 1.5rem;
+            }
+            
+            .day-counter {
+                font-size: 4rem;
+            }
         }
     </style>
 </head>
 <body>
+    <button class="theme-toggle" id="themeToggle">
+        <i class="fas fa-moon"></i>
+    </button>
+    
     <div class="container">
-        <h1>Tobat Tracker</h1>
-        <div class="message">You've been strong for</div>
-        <div class="day-counter">Day 1</div>
-        <div class="message">Keep up the good work!</div>
+        <h1>Penghitung Hari Tobat</h1>
+        <div class="message">Anda telah bertahan selama</div>
+        <div class="day-counter">Hari 1</div>
+        <div class="message">Teruskan perjuangan Anda!</div>
         
-        <button class="reset-btn" id="resetBtn">I Failed</button>
+        <div class="button-container">
+            <button class="reset-btn" id="resetBtn">Saya Gagal</button>
+        </div>
         
         <div class="confirmation" id="confirmation">
-            <p>Are you sure you want to reset your progress?</p>
+            <p>Yakin ingin mengulang dari hari pertama?</p>
             <div class="confirmation-buttons">
-                <button class="confirmation-btn confirm" id="confirmReset">Yes, Reset</button>
-                <button class="confirmation-btn cancel" id="cancelReset">Cancel</button>
+                <button class="confirmation-btn confirm" id="confirmReset">Ya, Reset</button>
+                <button class="confirmation-btn cancel" id="cancelReset">Batal</button>
             </div>
         </div>
         
         <div class="history">
-            <p>Longest streak: <span id="longestStreak">1</span> days</p>
-            <p>Last reset: <span id="lastReset">Never</span></p>
+            <p>Rekor tertinggi: <span id="longestStreak">1</span> hari</p>
+            <p>Terakhir reset: <span id="lastReset">Belum pernah</span></p>
         </div>
     </div>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Get DOM elements
+            // Elemen DOM
             const dayCounter = document.querySelector('.day-counter');
             const resetBtn = document.getElementById('resetBtn');
             const confirmation = document.getElementById('confirmation');
@@ -129,84 +221,110 @@
             const cancelReset = document.getElementById('cancelReset');
             const longestStreakEl = document.getElementById('longestStreak');
             const lastResetEl = document.getElementById('lastReset');
+            const themeToggle = document.getElementById('themeToggle');
+            const themeIcon = themeToggle.querySelector('i');
             
-            // Initialize data from localStorage or default values
+            // Inisialisasi data dari localStorage atau nilai default
             let data = JSON.parse(localStorage.getItem('tobatData')) || {
                 currentDay: 1,
                 lastDate: new Date().toDateString(),
                 longestStreak: 1,
-                lastReset: null
+                lastReset: null,
+                darkMode: false
             };
             
-            // Check if a new day has passed
+            // Set tema awal
+            if (data.darkMode) {
+                document.body.classList.add('dark-mode');
+                themeIcon.classList.replace('fa-moon', 'fa-sun');
+            }
+            
+            // Cek apakah sudah berganti hari
             const today = new Date().toDateString();
             if (today !== data.lastDate) {
-                // Check if it's the next day (not just a different day)
                 const lastDate = new Date(data.lastDate);
                 const currentDate = new Date();
                 
-                // If it's exactly one day later, increment the counter
+                // Jika sudah lewat tepat 1 hari, tambahkan counter
                 if (currentDate.setHours(0,0,0,0) - lastDate.setHours(0,0,0,0) === 86400000) {
                     data.currentDay++;
                     data.lastDate = today;
                     
-                    // Update longest streak if current is higher
+                    // Update rekor tertinggi jika lebih besar
                     if (data.currentDay > data.longestStreak) {
                         data.longestStreak = data.currentDay;
                     }
                     
-                    saveData();
+                    simpanData();
                 }
             }
             
-            // Update the UI with current data
+            // Update tampilan
             updateDisplay();
             
-            // Reset button click handler
+            // Tombol reset
             resetBtn.addEventListener('click', function() {
                 confirmation.style.display = 'block';
                 resetBtn.style.display = 'none';
             });
             
-            // Cancel reset handler
+            // Batal reset
             cancelReset.addEventListener('click', function() {
                 confirmation.style.display = 'none';
                 resetBtn.style.display = 'block';
             });
             
-            // Confirm reset handler
+            // Konfirmasi reset
             confirmReset.addEventListener('click', function() {
-                data.lastReset = new Date().toLocaleString();
+                data.lastReset = new Date().toLocaleString('id-ID');
                 data.currentDay = 1;
                 data.lastDate = new Date().toDateString();
-                saveData();
+                simpanData();
                 updateDisplay();
                 
                 confirmation.style.display = 'none';
                 resetBtn.style.display = 'block';
             });
             
-            // Save data to localStorage
-            function saveData() {
+            // Toggle tema gelap/terang
+            themeToggle.addEventListener('click', function() {
+                document.body.classList.toggle('dark-mode');
+                data.darkMode = !data.darkMode;
+                simpanData();
+                
+                if (data.darkMode) {
+                    themeIcon.classList.replace('fa-moon', 'fa-sun');
+                } else {
+                    themeIcon.classList.replace('fa-sun', 'fa-moon');
+                }
+            });
+            
+            // Simpan data ke localStorage
+            function simpanData() {
                 localStorage.setItem('tobatData', JSON.stringify(data));
             }
             
-            // Update the display with current data
+            // Update tampilan
             function updateDisplay() {
-                dayCounter.textContent = `Day ${data.currentDay}`;
+                dayCounter.textContent = `Hari ${data.currentDay}`;
                 longestStreakEl.textContent = data.longestStreak;
-                lastResetEl.textContent = data.lastReset || 'Never';
                 
-                // Update message based on day count
-                const message = document.querySelectorAll('.message');
-                if (data.currentDay === 1) {
-                    message[1].textContent = "You can do this!";
-                } else if (data.currentDay < 7) {
-                    message[1].textContent = "Keep up the good work!";
-                } else if (data.currentDay < 30) {
-                    message[1].textContent = "You're doing great!";
+                if (data.lastReset) {
+                    lastResetEl.textContent = data.lastReset;
                 } else {
-                    message[1].textContent = "Amazing commitment!";
+                    lastResetEl.textContent = 'Belum pernah';
+                }
+                
+                // Update pesan motivasi
+                const messages = document.querySelectorAll('.message');
+                if (data.currentDay === 1) {
+                    messages[1].textContent = "Anda bisa melakukannya!";
+                } else if (data.currentDay < 7) {
+                    messages[1].textContent = "Teruskan perjuangan Anda!";
+                } else if (data.currentDay < 30) {
+                    messages[1].textContent = "Anda luar biasa!";
+                } else {
+                    messages[1].textContent = "Komitmen yang mengagumkan!";
                 }
             }
         });
