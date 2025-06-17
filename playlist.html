@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta property="og:title" content="Dravin Music Player - Playlist">
+    <meta property="og:description" content="Pilih lagu favorit Anda dengan Dravin Music Player">
+    <meta property="og:image" content="https://files.catbox.moe/qwolmw.jpg">
+    <meta property="og:url" content="https://dr4vin.vercel.app/playlist.html">
+    <meta property="og:type" content="website">
+    <title>Dravin Music - Playlist</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4a76a8;
+            --bg-color: #f5f5f5;
+            --text-color: #333;
+            --card-bg: #fff;
+            --control-bg: #eee;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --highlight: #4a76a8;
+        }
+
+        .dark-mode {
+            --primary-color: #6b9bd2;
+            --bg-color: #121212;
+            --text-color: #f5f5f5;
+            --card-bg: #1e1e1e;
+            --control-bg: #2d2d2d;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            --highlight: #6b9bd2;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 15px 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        }
+
+        .dark-mode header {
+            border-bottom-color: rgba(255, 255, 255, 0.1);
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-size: 2rem;
+        }
+
+        /* Button Styles */
+        .back-btn, .theme-toggle, .select-btn {
+            background-color: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+            padding: 10px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: 12px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            position: relative;
+            overflow: hidden;
+            z-index: 1;
+        }
+
+        .back-btn:hover, .theme-toggle:hover, .select-btn:hover {
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .back-btn:active, .theme-toggle:active, .select-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .back-btn::before, .theme-toggle::before, .select-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--primary-color);
+            z-index: -1;
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.4s cubic-bezier(0.65, 0, 0.35, 1);
+        }
+
+        .back-btn:hover::before,
+        .theme-toggle:hover::before,
+        .select-btn:hover::before {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+
+        .dark-mode .back-btn,
+        .dark-mode .theme-toggle,
+        .dark-mode .select-btn {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .dark-mode .back-btn:hover,
+        .dark-mode .theme-toggle:hover,
+        .dark-mode .select-btn:hover {
+            color: white;
+        }
+
+        /* Button Icons Animation */
+        .back-btn i, .theme-toggle i, .select-btn i {
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover i, .theme-toggle:hover i, .select-btn:hover i {
+            transform: scale(1.1);
+        }
+
+        /* Playlist Container */
+        .playlist-container {
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        .search-box {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #777;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 10px 10px 35px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            background-color: var(--control-bg);
+            color: var(--text-color);
+        }
+
+        .list-header {
+            display: grid;
+            grid-template-columns: 50px 3fr 2fr 80px;
+            padding: 10px;
+            font-weight: bold;
+            border-bottom: 1px solid #ddd;
+            margin-bottom: 10px;
+        }
+
+        .music-item {
+            display: grid;
+            grid-template-columns: 50px 3fr 2fr 80px;
+            align-items: center;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 5px;
+        }
+
+        .music-item:hover {
+            background-color: var(--control-bg);
+        }
+
+        .music-item.selected {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .music-item.selected .music-artist,
+        .music-item.selected .music-duration {
+            color: #ddd;
+        }
+
+        .music-number {
+            text-align: center;
+        }
+
+        .music-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .music-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 5px;
+            object-fit: cover;
+        }
+
+        .music-artist {
+            color: #777;
+            font-size: 0.9rem;
+        }
+
+        .music-duration {
+            color: #777;
+            font-size: 0.9rem;
+        }
+
+        /* Selection Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            padding: 30px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 1.5rem;
+            color: var(--text-color);
+            cursor: pointer;
+        }
+
+        .modal-title {
+            margin-bottom: 20px;
+            color: var(--primary-color);
+            text-align: center;
+        }
+
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--control-bg);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--highlight);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .list-header, .music-item {
+                grid-template-columns: 30px 2fr 1fr 60px;
+            }
+            
+            .music-title {
+                gap: 8px;
+            }
+            
+            .music-img {
+                width: 30px;
+                height: 30px;
+            }
+            
+            header {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .header-buttons {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 10px;
+            }
+            
+            .back-btn, .theme-toggle, .select-btn {
+                margin: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Pilih Lagu</h1>
+        <div class="header-buttons">
+            <button class="back-btn" id="backBtn">
+                <i class="fas fa-arrow-left"></i> Kembali
+            </button>
+            <button class="select-btn" id="selectBtn">
+                <i class="fas fa-check"></i> Pilih Lagu
+            </button>
+            <button class="theme-toggle" id="themeToggle">
+                <i class="fas fa-moon"></i> Dark Mode
+            </button>
+        </div>
+    </header>
+
+    <div class="playlist-container">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" id="searchInput" placeholder="Cari judul atau artis...">
+        </div>
+        <div class="list-header">
+            <div class="header-item">#</div>
+            <div class="header-item">Judul</div>
+            <div class="header-item">Artis</div>
+            <div class="header-item">Durasi</div>
+        </div>
+        <div id="musicListContainer">
+            <!-- Daftar lagu akan dimuat di sini -->
+        </div>
+    </div>
+
+    <!-- Modal untuk memilih lagu -->
+    <div class="modal" id="selectionModal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeModal">&times;</span>
+            <h2 class="modal-title">Lagu Dipilih</h2>
+            <div id="selectedSongInfo" style="text-align: center; margin-top: 20px;">
+                <!-- Informasi lagu yang dipilih akan ditampilkan di sini -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let songs = []; // Untuk menyimpan daftar lagu
+        let selectedSongIndex = -1; // Indeks lagu yang dipilih
+
+        // DOM elements
+        const backBtn = document.getElementById('backBtn');
+        const selectBtn = document.getElementById('selectBtn');
+        const themeToggle = document.getElementById('themeToggle');
+        const musicListContainer = document.getElementById('musicListContainer');
+        const searchInput = document.getElementById('searchInput');
+        const selectionModal = document.getElementById('selectionModal');
+        const closeModal = document.getElementById('closeModal');
+        const selectedSongInfo = document.getElementById('selectedSongInfo');
+
+        // Initialize playlist
+        async function initPlaylist() {
+            await loadSongsFromJSON();
+            updateThemeToggle();
+        }
+
+        // Load songs from songs.json
+        async function loadSongsFromJSON() {
+            try {
+                const response = await fetch('songs.json?v=' + new Date().getTime());
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                songs = await response.json();
+                
+                if (songs.length === 0) {
+                    console.warn("songs.json is empty or invalid.");
+                    musicListContainer.innerHTML = '<p style="text-align: center; color: var(--text-color);">Tidak ada lagu yang ditemukan.</p>';
+                    return;
+                }
+
+                renderPlaylist();
+            } catch (error) {
+                console.error("Failed to load songs from songs.json:", error);
+                musicListContainer.innerHTML = '<p style="text-align: center; color: var(--error-color);">Gagal memuat daftar lagu. Silakan coba lagi nanti.</p>';
+            }
+        }
+
+        // Render playlist
+        function renderPlaylist() {
+            musicListContainer.innerHTML = '';
+            
+            songs.forEach((song, index) => {
+                const musicItem = document.createElement('div');
+                musicItem.classList.add('music-item');
+                
+                musicItem.innerHTML = `
+                    <div class="music-number">${index + 1}</div>
+                    <div class="music-title">
+                        <img src="${song.thumbnail}" alt="${song.title}" class="music-img">
+                        ${song.title}
+                    </div>
+                    <div class="music-artist">${song.artist}</div>
+                    <div class="music-duration">${song.duration}</div>
+                `;
+                
+                musicItem.addEventListener('click', () => {
+                    // Hapus selected class dari semua item
+                    document.querySelectorAll('.music-item').forEach(item => {
+                        item.classList.remove('selected');
+                    });
+                    
+                    // Tambahkan selected class ke item yang diklik
+                    musicItem.classList.add('selected');
+                    selectedSongIndex = index;
+                });
+                
+                musicListContainer.appendChild(musicItem);
+            });
+        }
+
+        // Setup search functionality
+        function setupSearch() {
+            searchInput.addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase();
+                const items = document.querySelectorAll('.music-item');
+                
+                items.forEach((item, index) => {
+                    if (songs[index]) {
+                        const title = songs[index].title.toLowerCase();
+                        const artist = songs[index].artist.toLowerCase();
+                        
+                        if (title.includes(searchTerm) || artist.includes(searchTerm)) {
+                            item.style.display = 'grid';
+                        } else {
+                            item.style.display = 'none';
+                        }
+                    }
+                });
+            });
+        }
+
+        // Show selected song in modal
+        function showSelectedSong() {
+            if (selectedSongIndex === -1) {
+                alert('Silakan pilih lagu terlebih dahulu!');
+                return;
+            }
+            
+            const song = songs[selectedSongIndex];
+            selectedSongInfo.innerHTML = `
+                <img src="${song.thumbnail}" alt="${song.title}" style="width: 150px; height: 150px; border-radius: 10px; object-fit: cover; margin-bottom: 15px;">
+                <h3 style="margin-bottom: 5px;">${song.title}</h3>
+                <p style="color: var(--primary-color); margin-bottom: 5px;">${song.artist}</p>
+                <p style="font-size: 0.9rem; margin-bottom: 15px;">Durasi: ${song.duration} • Rilis: ${song.releaseDate}</p>
+                <audio controls style="width: 100%; margin-top: 15px;">
+                    <source src="${song.mp3}" type="audio/mpeg">
+                    Browser Anda tidak mendukung pemutaran audio.
+                </audio>
+                <button id="confirmSelection" style="margin-top: 20px; background-color: var(--primary-color); color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+                    <i class="fas fa-check"></i> Konfirmasi Pilihan
+                </button>
+            `;
+            
+            selectionModal.style.display = 'flex';
+            
+            // Set up confirm button
+            document.getElementById('confirmSelection')?.addEventListener('click', () => {
+                // Simpan lagu yang dipilih ke localStorage
+                localStorage.setItem('selectedSongIndex', selectedSongIndex);
+                alert(`Lagu "${song.title}" telah dipilih!`);
+                selectionModal.style.display = 'none';
+            });
+        }
+
+        // Toggle dark/light theme
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDarkMode);
+            updateThemeToggle();
+        }
+
+        // Update theme toggle button
+        function updateThemeToggle() {
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            if (isDarkMode) {
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i> Light Mode';
+            } else {
+                themeToggle.innerHTML = '<i class="fas fa-moon"></i> Dark Mode';
+            }
+        }
+
+        // Check for saved theme preference
+        function checkThemePreference() {
+            const darkMode = localStorage.getItem('darkMode') === 'true';
+            if (darkMode) {
+                document.body.classList.add('dark-mode');
+            }
+            updateThemeToggle();
+        }
+
+        // Event listeners
+        backBtn.addEventListener('click', () => {
+            window.location.href = 'index.html';
+        });
+
+        selectBtn.addEventListener('click', showSelectedSong);
+
+        closeModal.addEventListener('click', () => {
+            selectionModal.style.display = 'none';
+        });
+
+        window.addEventListener('click', (e) => {
+            if (e.target === selectionModal) {
+                selectionModal.style.display = 'none';
+            }
+        });
+
+        themeToggle.addEventListener('click', toggleTheme);
+
+        // Initialize
+        checkThemePreference();
+        initPlaylist();
+        setupSearch();
+    </script>
+</body>
+  </html>
