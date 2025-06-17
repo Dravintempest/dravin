@@ -3,13 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta property="og:title" content="Dravin Music Player - Playlist">
-    <meta property="og:description" content="Pilih lagu favorit Anda dengan Dravin Music Player">
-    <meta property="og:image" content="https://files.catbox.moe/qwolmw.jpg">
-    <meta property="og:url" content="https://dr4vin.vercel.app/playlist.html">
-    <meta property="og:type" content="website">
-    <title>Dravin Music - Playlist</title>
-    <link rel="icon" type="image/png" href="favicon.png">
+    <title>Playlist - Dravin Music</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -19,7 +13,6 @@
             --card-bg: #fff;
             --control-bg: #eee;
             --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            --highlight: #4a76a8;
         }
 
         .dark-mode {
@@ -29,7 +22,6 @@
             --card-bg: #1e1e1e;
             --control-bg: #2d2d2d;
             --shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-            --highlight: #6b9bd2;
         }
 
         * {
@@ -53,8 +45,8 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 30px;
-            padding: 15px 0;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
             border-bottom: 1px solid rgba(0, 0, 0, 0.1);
         }
 
@@ -64,176 +56,84 @@
 
         h1 {
             color: var(--primary-color);
-            font-size: 2rem;
         }
 
-        /* Button Styles */
-        .back-btn, .theme-toggle, .select-btn {
+        .btn {
             background-color: transparent;
             color: var(--primary-color);
             border: 2px solid var(--primary-color);
-            padding: 10px 20px;
-            border-radius: 30px;
+            padding: 8px 15px;
+            border-radius: 20px;
             cursor: pointer;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             display: flex;
             align-items: center;
             gap: 8px;
-            margin-left: 12px;
-            transition: all 0.3s ease;
-            font-weight: 600;
-            position: relative;
-            overflow: hidden;
-            z-index: 1;
+            transition: all 0.3s;
         }
 
-        .back-btn:hover, .theme-toggle:hover, .select-btn:hover {
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        }
-
-        .back-btn:active, .theme-toggle:active, .select-btn:active {
-            transform: translateY(0);
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .back-btn::before, .theme-toggle::before, .select-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: var(--primary-color);
-            z-index: -1;
-            transform: scaleX(0);
-            transform-origin: right;
-            transition: transform 0.4s cubic-bezier(0.65, 0, 0.35, 1);
-        }
-
-        .back-btn:hover::before,
-        .theme-toggle:hover::before,
-        .select-btn:hover::before {
-            transform: scaleX(1);
-            transform-origin: left;
-        }
-
-        .dark-mode .back-btn,
-        .dark-mode .theme-toggle,
-        .dark-mode .select-btn {
-            border-color: var(--primary-color);
-            color: var(--primary-color);
-        }
-
-        .dark-mode .back-btn:hover,
-        .dark-mode .theme-toggle:hover,
-        .dark-mode .select-btn:hover {
-            color: white;
-        }
-
-        /* Button Icons Animation */
-        .back-btn i, .theme-toggle i, .select-btn i {
-            transition: all 0.3s ease;
-        }
-
-        .back-btn:hover i, .theme-toggle:hover i, .select-btn:hover i {
-            transform: scale(1.1);
-        }
-
-        /* Playlist Container */
-        .playlist-container {
-            background-color: var(--card-bg);
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: var(--shadow);
-            max-height: 70vh;
-            overflow-y: auto;
-        }
-
-        .search-box {
-            position: relative;
-            margin-bottom: 20px;
-        }
-
-        .search-box i {
-            position: absolute;
-            left: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #777;
-        }
-
-        .search-box input {
-            width: 100%;
-            padding: 10px 10px 10px 35px;
-            border: 1px solid #ddd;
-            border-radius: 20px;
-            background-color: var(--control-bg);
-            color: var(--text-color);
-        }
-
-        .list-header {
-            display: grid;
-            grid-template-columns: 50px 3fr 2fr 80px;
-            padding: 10px;
-            font-weight: bold;
-            border-bottom: 1px solid #ddd;
-            margin-bottom: 10px;
-        }
-
-        .music-item {
-            display: grid;
-            grid-template-columns: 50px 3fr 2fr 80px;
-            align-items: center;
-            padding: 10px;
-            border-radius: 8px;
-            cursor: pointer;
-            margin-bottom: 5px;
-        }
-
-        .music-item:hover {
-            background-color: var(--control-bg);
-        }
-
-        .music-item.selected {
+        .btn:hover {
             background-color: var(--primary-color);
             color: white;
         }
 
-        .music-item.selected .music-artist,
-        .music-item.selected .music-duration {
-            color: #ddd;
+        .playlist-container {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
         }
 
-        .music-number {
-            text-align: center;
+        .song-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid var(--control-bg);
         }
 
-        .music-title {
+        .song-info {
             display: flex;
             align-items: center;
             gap: 15px;
+            flex: 1;
         }
 
-        .music-img {
+        .song-img {
             width: 40px;
             height: 40px;
             border-radius: 5px;
             object-fit: cover;
         }
 
-        .music-artist {
-            color: #777;
-            font-size: 0.9rem;
+        .song-details {
+            flex: 1;
         }
 
-        .music-duration {
-            color: #777;
-            font-size: 0.9rem;
+        .song-title {
+            font-weight: 500;
         }
 
-        /* Selection Modal */
+        .song-artist {
+            font-size: 0.8rem;
+            color: #777;
+        }
+
+        .song-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            background: none;
+            border: none;
+            color: var(--text-color);
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        /* Song Selection Modal */
         .modal {
             display: none;
             position: fixed;
@@ -242,312 +142,343 @@
             width: 100%;
             height: 100%;
             background-color: rgba(0, 0, 0, 0.7);
-            z-index: 1000;
+            z-index: 100;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
+            padding-top: 50px;
+            overflow-y: auto;
         }
 
         .modal-content {
             background-color: var(--card-bg);
-            border-radius: 15px;
-            padding: 30px;
+            border-radius: 10px;
             width: 90%;
-            max-width: 600px;
+            max-width: 800px;
             max-height: 80vh;
             overflow-y: auto;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            position: relative;
+            box-shadow: var(--shadow);
+            padding: 20px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--control-bg);
         }
 
         .close-modal {
-            position: absolute;
-            top: 15px;
-            right: 15px;
             font-size: 1.5rem;
-            color: var(--text-color);
             cursor: pointer;
         }
 
-        .modal-title {
-            margin-bottom: 20px;
+        .search-box {
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 15px 10px 40px;
+            border-radius: 20px;
+            border: 1px solid var(--control-bg);
+            background-color: var(--control-bg);
+            color: var(--text-color);
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #777;
+        }
+
+        .song-list {
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        .select-song-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 5px;
+            cursor: pointer;
+        }
+
+        .select-song-item:hover {
+            background-color: var(--control-bg);
+        }
+
+        .preview-btn {
+            margin-left: auto;
             color: var(--primary-color);
-            text-align: center;
         }
 
-        /* Scrollbar styling */
-        ::-webkit-scrollbar {
-            width: 8px;
+        /* Audio Player in Modal */
+        .audio-preview {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--card-bg);
+            padding: 10px;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            display: none;
         }
 
-        ::-webkit-scrollbar-track {
-            background: var(--control-bg);
-            border-radius: 4px;
+        .audio-preview audio {
+            width: 100%;
         }
 
-        ::-webkit-scrollbar-thumb {
-            background: var(--primary-color);
-            border-radius: 4px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--highlight);
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .list-header, .music-item {
-                grid-template-columns: 30px 2fr 1fr 60px;
-            }
-            
-            .music-title {
-                gap: 8px;
-            }
-            
-            .music-img {
-                width: 30px;
-                height: 30px;
-            }
-            
-            header {
-                flex-direction: column;
-                gap: 15px;
-            }
-            
-            .header-buttons {
-                display: flex;
-                flex-wrap: wrap;
-                justify-content: center;
-                gap: 10px;
-            }
-            
-            .back-btn, .theme-toggle, .select-btn {
-                margin: 0;
-            }
+        .close-preview {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            cursor: pointer;
         }
     </style>
 </head>
 <body>
     <header>
-        <h1>Pilih Lagu</h1>
-        <div class="header-buttons">
-            <button class="back-btn" id="backBtn">
+        <h1>Playlist Saya</h1>
+        <div>
+            <button class="btn" id="backBtn">
                 <i class="fas fa-arrow-left"></i> Kembali
             </button>
-            <button class="select-btn" id="selectBtn">
-                <i class="fas fa-check"></i> Pilih Lagu
+            <button class="btn" id="addSongBtn">
+                <i class="fas fa-plus"></i> Tambah Lagu
             </button>
-            <button class="theme-toggle" id="themeToggle">
-                <i class="fas fa-moon"></i> Dark Mode
+            <button class="btn" id="themeToggle">
+                <i class="fas fa-moon"></i> Tema
             </button>
         </div>
     </header>
 
     <div class="playlist-container">
-        <div class="search-box">
-            <i class="fas fa-search"></i>
-            <input type="text" id="searchInput" placeholder="Cari judul atau artis...">
-        </div>
-        <div class="list-header">
-            <div class="header-item">#</div>
-            <div class="header-item">Judul</div>
-            <div class="header-item">Artis</div>
-            <div class="header-item">Durasi</div>
-        </div>
-        <div id="musicListContainer">
-            <!-- Daftar lagu akan dimuat di sini -->
+        <div id="playlistSongs">
+            <!-- Daftar lagu di playlist akan muncul di sini -->
+            <p style="text-align: center;">Belum ada lagu di playlist</p>
         </div>
     </div>
 
     <!-- Modal untuk memilih lagu -->
-    <div class="modal" id="selectionModal">
+    <div class="modal" id="songModal">
         <div class="modal-content">
-            <span class="close-modal" id="closeModal">&times;</span>
-            <h2 class="modal-title">Lagu Dipilih</h2>
-            <div id="selectedSongInfo" style="text-align: center; margin-top: 20px;">
-                <!-- Informasi lagu yang dipilih akan ditampilkan di sini -->
+            <div class="modal-header">
+                <h2>Pilih Lagu</h2>
+                <span class="close-modal" id="closeModal">&times;</span>
+            </div>
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchSong" placeholder="Cari judul atau artis...">
+            </div>
+            <div class="song-list" id="allSongsList">
+                <!-- Daftar semua lagu akan muncul di sini -->
             </div>
         </div>
     </div>
 
+    <!-- Audio preview -->
+    <div class="audio-preview" id="audioPreview">
+        <span class="close-preview" id="closePreview">&times;</span>
+        <audio controls id="previewAudio"></audio>
+    </div>
+
     <script>
-        let songs = []; // Untuk menyimpan daftar lagu
-        let selectedSongIndex = -1; // Indeks lagu yang dipilih
-
-        // DOM elements
+        // DOM Elements
         const backBtn = document.getElementById('backBtn');
-        const selectBtn = document.getElementById('selectBtn');
+        const addSongBtn = document.getElementById('addSongBtn');
         const themeToggle = document.getElementById('themeToggle');
-        const musicListContainer = document.getElementById('musicListContainer');
-        const searchInput = document.getElementById('searchInput');
-        const selectionModal = document.getElementById('selectionModal');
+        const songModal = document.getElementById('songModal');
         const closeModal = document.getElementById('closeModal');
-        const selectedSongInfo = document.getElementById('selectedSongInfo');
+        const searchSong = document.getElementById('searchSong');
+        const allSongsList = document.getElementById('allSongsList');
+        const playlistSongs = document.getElementById('playlistSongs');
+        const audioPreview = document.getElementById('audioPreview');
+        const previewAudio = document.getElementById('previewAudio');
+        const closePreview = document.getElementById('closePreview');
 
-        // Initialize playlist
-        async function initPlaylist() {
-            await loadSongsFromJSON();
-            updateThemeToggle();
+        // State
+        let allSongs = [];
+        let playlist = JSON.parse(localStorage.getItem('playlist')) || [];
+
+        // Initialize
+        function init() {
+            loadSongs();
+            renderPlaylist();
+            checkTheme();
+            setupEventListeners();
         }
 
-        // Load songs from songs.json
-        async function loadSongsFromJSON() {
+        // Load songs from JSON
+        async function loadSongs() {
             try {
-                const response = await fetch('songs.json?v=' + new Date().getTime());
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                songs = await response.json();
-                
-                if (songs.length === 0) {
-                    console.warn("songs.json is empty or invalid.");
-                    musicListContainer.innerHTML = '<p style="text-align: center; color: var(--text-color);">Tidak ada lagu yang ditemukan.</p>';
-                    return;
-                }
-
-                renderPlaylist();
+                const response = await fetch('songs.json');
+                if (!response.ok) throw new Error('Failed to load songs');
+                allSongs = await response.json();
+                renderSongList(allSongs);
             } catch (error) {
-                console.error("Failed to load songs from songs.json:", error);
-                musicListContainer.innerHTML = '<p style="text-align: center; color: var(--error-color);">Gagal memuat daftar lagu. Silakan coba lagi nanti.</p>';
+                console.error('Error loading songs:', error);
+                allSongsList.innerHTML = '<p>Gagal memuat daftar lagu</p>';
             }
+        }
+
+        // Render song list in modal
+        function renderSongList(songs) {
+            allSongsList.innerHTML = '';
+            
+            if (songs.length === 0) {
+                allSongsList.innerHTML = '<p>Tidak ada lagu ditemukan</p>';
+                return;
+            }
+
+            songs.forEach(song => {
+                const songItem = document.createElement('div');
+                songItem.className = 'select-song-item';
+                songItem.innerHTML = `
+                    <img src="${song.thumbnail}" class="song-img" alt="${song.title}">
+                    <div>
+                        <div class="song-title">${song.title}</div>
+                        <div class="song-artist">${song.artist}</div>
+                    </div>
+                    <div class="song-duration">${song.duration}</div>
+                    <button class="preview-btn action-btn" data-src="${song.mp3}">
+                        <i class="fas fa-play"></i> Preview
+                    </button>
+                    <button class="btn" data-id="${song.id}">
+                        <i class="fas fa-plus"></i> Tambah
+                    </button>
+                `;
+                allSongsList.appendChild(songItem);
+            });
         }
 
         // Render playlist
         function renderPlaylist() {
-            musicListContainer.innerHTML = '';
-            
-            songs.forEach((song, index) => {
-                const musicItem = document.createElement('div');
-                musicItem.classList.add('music-item');
-                
-                musicItem.innerHTML = `
-                    <div class="music-number">${index + 1}</div>
-                    <div class="music-title">
-                        <img src="${song.thumbnail}" alt="${song.title}" class="music-img">
-                        ${song.title}
-                    </div>
-                    <div class="music-artist">${song.artist}</div>
-                    <div class="music-duration">${song.duration}</div>
-                `;
-                
-                musicItem.addEventListener('click', () => {
-                    // Hapus selected class dari semua item
-                    document.querySelectorAll('.music-item').forEach(item => {
-                        item.classList.remove('selected');
-                    });
-                    
-                    // Tambahkan selected class ke item yang diklik
-                    musicItem.classList.add('selected');
-                    selectedSongIndex = index;
-                });
-                
-                musicListContainer.appendChild(musicItem);
-            });
-        }
-
-        // Setup search functionality
-        function setupSearch() {
-            searchInput.addEventListener('input', (e) => {
-                const searchTerm = e.target.value.toLowerCase();
-                const items = document.querySelectorAll('.music-item');
-                
-                items.forEach((item, index) => {
-                    if (songs[index]) {
-                        const title = songs[index].title.toLowerCase();
-                        const artist = songs[index].artist.toLowerCase();
-                        
-                        if (title.includes(searchTerm) || artist.includes(searchTerm)) {
-                            item.style.display = 'grid';
-                        } else {
-                            item.style.display = 'none';
-                        }
-                    }
-                });
-            });
-        }
-
-        // Show selected song in modal
-        function showSelectedSong() {
-            if (selectedSongIndex === -1) {
-                alert('Silakan pilih lagu terlebih dahulu!');
+            if (playlist.length === 0) {
+                playlistSongs.innerHTML = '<p style="text-align: center;">Belum ada lagu di playlist</p>';
                 return;
             }
-            
-            const song = songs[selectedSongIndex];
-            selectedSongInfo.innerHTML = `
-                <img src="${song.thumbnail}" alt="${song.title}" style="width: 150px; height: 150px; border-radius: 10px; object-fit: cover; margin-bottom: 15px;">
-                <h3 style="margin-bottom: 5px;">${song.title}</h3>
-                <p style="color: var(--primary-color); margin-bottom: 5px;">${song.artist}</p>
-                <p style="font-size: 0.9rem; margin-bottom: 15px;">Durasi: ${song.duration} • Rilis: ${song.releaseDate}</p>
-                <audio controls style="width: 100%; margin-top: 15px;">
-                    <source src="${song.mp3}" type="audio/mpeg">
-                    Browser Anda tidak mendukung pemutaran audio.
-                </audio>
-                <button id="confirmSelection" style="margin-top: 20px; background-color: var(--primary-color); color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
-                    <i class="fas fa-check"></i> Konfirmasi Pilihan
-                </button>
-            `;
-            
-            selectionModal.style.display = 'flex';
-            
-            // Set up confirm button
-            document.getElementById('confirmSelection')?.addEventListener('click', () => {
-                // Simpan lagu yang dipilih ke localStorage
-                localStorage.setItem('selectedSongIndex', selectedSongIndex);
-                alert(`Lagu "${song.title}" telah dipilih!`);
-                selectionModal.style.display = 'none';
+
+            playlistSongs.innerHTML = '';
+            playlist.forEach(song => {
+                const songItem = document.createElement('div');
+                songItem.className = 'song-item';
+                songItem.innerHTML = `
+                    <div class="song-info">
+                        <img src="${song.thumbnail}" class="song-img" alt="${song.title}">
+                        <div class="song-details">
+                            <div class="song-title">${song.title}</div>
+                            <div class="song-artist">${song.artist}</div>
+                        </div>
+                    </div>
+                    <div class="song-actions">
+                        <button class="action-btn" title="Putar">
+                            <i class="fas fa-play"></i>
+                        </button>
+                        <button class="action-btn" title="Hapus">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                `;
+                playlistSongs.appendChild(songItem);
             });
         }
 
-        // Toggle dark/light theme
+        // Search songs
+        function searchSongs() {
+            const term = searchSong.value.toLowerCase();
+            const filtered = allSongs.filter(song => 
+                song.title.toLowerCase().includes(term) || 
+                song.artist.toLowerCase().includes(term)
+            );
+            renderSongList(filtered);
+        }
+
+        // Toggle theme
         function toggleTheme() {
             document.body.classList.toggle('dark-mode');
-            const isDarkMode = document.body.classList.contains('dark-mode');
-            localStorage.setItem('darkMode', isDarkMode);
-            updateThemeToggle();
+            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+            updateThemeIcon();
         }
 
-        // Update theme toggle button
-        function updateThemeToggle() {
-            const isDarkMode = document.body.classList.contains('dark-mode');
-            if (isDarkMode) {
-                themeToggle.innerHTML = '<i class="fas fa-sun"></i> Light Mode';
-            } else {
-                themeToggle.innerHTML = '<i class="fas fa-moon"></i> Dark Mode';
-            }
-        }
-
-        // Check for saved theme preference
-        function checkThemePreference() {
+        // Check saved theme
+        function checkTheme() {
             const darkMode = localStorage.getItem('darkMode') === 'true';
-            if (darkMode) {
-                document.body.classList.add('dark-mode');
-            }
-            updateThemeToggle();
+            if (darkMode) document.body.classList.add('dark-mode');
+            updateThemeIcon();
         }
 
-        // Event listeners
-        backBtn.addEventListener('click', () => {
-            window.location.href = 'index.html';
-        });
-
-        selectBtn.addEventListener('click', showSelectedSong);
-
-        closeModal.addEventListener('click', () => {
-            selectionModal.style.display = 'none';
-        });
-
-        window.addEventListener('click', (e) => {
-            if (e.target === selectionModal) {
-                selectionModal.style.display = 'none';
+        // Update theme icon
+        function updateThemeIcon() {
+            const icon = themeToggle.querySelector('i');
+            if (document.body.classList.contains('dark-mode')) {
+                icon.classList.replace('fa-moon', 'fa-sun');
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i> Tema';
+            } else {
+                icon.classList.replace('fa-sun', 'fa-moon');
+                themeToggle.innerHTML = '<i class="fas fa-moon"></i> Tema';
             }
-        });
+        }
 
-        themeToggle.addEventListener('click', toggleTheme);
+        // Setup event listeners
+        function setupEventListeners() {
+            // Navigation
+            backBtn.addEventListener('click', () => window.location.href = 'index.html');
+            addSongBtn.addEventListener('click', () => songModal.style.display = 'flex');
+            closeModal.addEventListener('click', () => songModal.style.display = 'none');
+            
+            // Theme toggle
+            themeToggle.addEventListener('click', toggleTheme);
+            
+            // Search
+            searchSong.addEventListener('input', searchSongs);
+            
+            // Song selection
+            allSongsList.addEventListener('click', (e) => {
+                // Preview song
+                if (e.target.closest('.preview-btn')) {
+                    const btn = e.target.closest('.preview-btn');
+                    const audioSrc = btn.getAttribute('data-src');
+                    previewAudio.src = audioSrc;
+                    audioPreview.style.display = 'block';
+                    previewAudio.play();
+                }
+                
+                // Add to playlist
+                if (e.target.closest('.btn') && !e.target.closest('.preview-btn')) {
+                    const btn = e.target.closest('.btn');
+                    const songId = btn.getAttribute('data-id');
+                    const songToAdd = allSongs.find(song => song.id == songId);
+                    
+                    if (songToAdd && !playlist.some(song => song.id == songId)) {
+                        playlist.push(songToAdd);
+                        localStorage.setItem('playlist', JSON.stringify(playlist));
+                        renderPlaylist();
+                    }
+                }
+            });
+            
+            // Close preview
+            closePreview.addEventListener('click', () => {
+                previewAudio.pause();
+                audioPreview.style.display = 'none';
+            });
+            
+            // Close modal when clicking outside
+            window.addEventListener('click', (e) => {
+                if (e.target === songModal) songModal.style.display = 'none';
+            });
+        }
 
-        // Initialize
-        checkThemePreference();
-        initPlaylist();
-        setupSearch();
+        // Initialize the app
+        init();
     </script>
 </body>
-  </html>
+</html>
