@@ -3,6 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <meta property="og:title" content="Dravin Music Player">
+<meta property="og:description" content="Nikmati musik favorit Anda dengan Dravin Music Player">
+<meta property="og:image" content="https://files.catbox.moe/qwolmw.jpg">
+<meta property="og:url" content="https://dr4vin.vercel.app">
+<meta property="og:type" content="website">
     <title>Dravin music web</title>
     <link rel="icon" type="image/png" href="favicon.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -146,10 +151,6 @@ h1 {
 
 .request-btn:hover i {
     animation: musicNote 0.6s ease infinite;
-}
-
-.playlist-btn:hover i {
-    animation: pulse 1.8s ease infinite;
 }
 
 @keyframes pulse {
@@ -346,7 +347,7 @@ h1 {
 
 .list-header {
     display: grid;
-    grid-template-columns: 50px 3fr 2fr 80px 40px;
+    grid-template-columns: 50px 3fr 2fr 80px;
     padding: 10px;
     font-weight: bold;
     border-bottom: 1px solid #ddd;
@@ -355,7 +356,7 @@ h1 {
 
 .music-item {
     display: grid;
-    grid-template-columns: 50px 3fr 2fr 80px 40px;
+    grid-template-columns: 50px 3fr 2fr 80px;
     align-items: center;
     padding: 10px;
     border-radius: 8px;
@@ -408,113 +409,6 @@ h1 {
     color: var(--primary-color);
 }
 
-.add-to-playlist {
-    color: var(--primary-color);
-    cursor: pointer;
-    text-align: center;
-}
-
-.add-to-playlist:hover {
-    transform: scale(1.2);
-}
-
-.add-to-playlist.active {
-    color: gold;
-}
-
-/* Playlist modal */
-.modal {
-    display: none;
-    position: fixed;
-    z-index: 100;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-}
-
-.modal-content {
-    background-color: var(--card-bg);
-    margin: 10% auto;
-    padding: 20px;
-    border-radius: 10px;
-    width: 80%;
-    max-width: 500px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-}
-
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    padding-bottom: 10px;
-    border-bottom: 1px solid var(--control-bg);
-}
-
-.modal-title {
-    font-size: 1.5rem;
-    color: var(--primary-color);
-}
-
-.close-btn {
-    font-size: 1.5rem;
-    cursor: pointer;
-    color: var(--text-color);
-}
-
-.close-btn:hover {
-    color: var(--primary-color);
-}
-
-.playlist-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 10px;
-    border-bottom: 1px solid var(--control-bg);
-}
-
-.playlist-item:last-child {
-    border-bottom: none;
-}
-
-.playlist-item-info {
-    flex: 1;
-}
-
-.playlist-item-title {
-    font-weight: bold;
-}
-
-.playlist-item-artist {
-    font-size: 0.9rem;
-    color: var(--primary-color);
-}
-
-.playlist-item-actions {
-    display: flex;
-    gap: 10px;
-}
-
-.playlist-item-btn {
-    background: none;
-    border: none;
-    color: var(--primary-color);
-    cursor: pointer;
-}
-
-.playlist-item-btn:hover {
-    opacity: 0.8;
-}
-
-.playlist-empty {
-    text-align: center;
-    padding: 20px;
-    color: var(--text-color);
-}
-
 /* Scrollbar styling */
 ::-webkit-scrollbar {
     width: 8px;
@@ -543,7 +437,7 @@ h1 {
                 <i class="fas fa-music"></i> Request
             </button>
             <button class="playlist-btn" id="playlistBtn">
-                <i class="fas fa-list"></i> My Playlist
+                <i class="fas fa-list"></i> Playlist
             </button>
             <button class="theme-toggle" id="themeToggle">
                 <i class="fas fa-moon"></i>Dark Mode
@@ -602,23 +496,9 @@ h1 {
                 <div class="header-item">Judul</div>
                 <div class="header-item">Artis</div>
                 <div class="header-item">Durasi</div>
-                <div class="header-item"></div>
             </div>
             <div id="musicListContainer">
-            </div>
-        </div>
-    </div>
-
-    <!-- Playlist Modal -->
-    <div id="playlistModal" class="modal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3 class="modal-title">My Playlist</h3>
-                <span class="close-btn">&times;</span>
-            </div>
-            <div id="playlistItems">
-                <p class="playlist-empty">Playlist kamu kosong</p>
-            </div>
+                </div>
         </div>
     </div>
 
@@ -626,7 +506,6 @@ h1 {
 
     <script>
         let songs = []; // Inisialisasi kosong, nanti akan diisi dari songs.json
-        let playlist = JSON.parse(localStorage.getItem('musicPlayerPlaylist')) || [];
 
         // DOM elements
         const audioPlayer = document.getElementById('audioPlayer');
@@ -649,9 +528,6 @@ h1 {
         const requestBtn = document.getElementById('requestBtn');
         const playlistBtn = document.getElementById('playlistBtn');
         const searchInput = document.getElementById('searchInput');
-        const playlistModal = document.getElementById('playlistModal');
-        const playlistItems = document.getElementById('playlistItems');
-        const closeModal = document.querySelector('.close-btn');
 
         // Player state
         let currentSongIndex = 0;
@@ -662,7 +538,6 @@ h1 {
         async function initPlayer() {
             await loadSongsFromJSON(); // Tunggu hingga lagu dimuat
             updateThemeToggle();
-            renderPlaylistModal();
         }
 
         // Load songs from songs.json
@@ -723,9 +598,6 @@ h1 {
                     musicItem.classList.add('active');
                 }
                 
-                // Check if song is in playlist
-                const isInPlaylist = playlist.some(item => item.id === song.id);
-                
                 musicItem.innerHTML = `
                     <div class="music-number">${index + 1}</div>
                     <div class="music-title">
@@ -734,139 +606,16 @@ h1 {
                     </div>
                     <div class="music-artist">${song.artist}</div>
                     <div class="music-duration">${song.duration}</div>
-                    <div class="add-to-playlist ${isInPlaylist ? 'active' : ''}" data-id="${song.id}">
-                        <i class="fas ${isInPlaylist ? 'fa-star' : 'fa-plus'}"></i>
-                    </div>
                 `;
                 
-                musicItem.addEventListener('click', (e) => {
-                    // Don't change song if clicking on the add button
-                    if (!e.target.closest('.add-to-playlist')) {
-                        currentSongIndex = index;
-                        loadSong(currentSongIndex);
-                        playSong();
-                    }
-                });
-                
-                // Add to playlist button
-                const addBtn = musicItem.querySelector('.add-to-playlist');
-                addBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    togglePlaylistSong(song);
-                    
-                    // Update button state
-                    const isInPlaylistNow = playlist.some(item => item.id === song.id);
-                    addBtn.classList.toggle('active', isInPlaylistNow);
-                    addBtn.innerHTML = `<i class="fas ${isInPlaylistNow ? 'fa-star' : 'fa-plus'}"></i>`;
+                musicItem.addEventListener('click', () => {
+                    currentSongIndex = index;
+                    loadSong(currentSongIndex);
+                    playSong();
                 });
                 
                 musicListContainer.appendChild(musicItem);
             });
-        }
-
-        // Toggle song in playlist
-        function togglePlaylistSong(song) {
-            const index = playlist.findIndex(item => item.id === song.id);
-            
-            if (index === -1) {
-                // Add to playlist
-                playlist.push({
-                    id: song.id,
-                    title: song.title,
-                    artist: song.artist,
-                    thumbnail: song.thumbnail,
-                    mp3: song.mp3,
-                    duration: song.duration,
-                    releaseDate: song.releaseDate
-                });
-            } else {
-                // Remove from playlist
-                playlist.splice(index, 1);
-            }
-            
-            // Save to localStorage
-            localStorage.setItem('musicPlayerPlaylist', JSON.stringify(playlist));
-            
-            // Update playlist modal
-            renderPlaylistModal();
-        }
-
-        // Render playlist modal
-        function renderPlaylistModal() {
-            playlistItems.innerHTML = '';
-            
-            if (playlist.length === 0) {
-                playlistItems.innerHTML = '<p class="playlist-empty">Playlist kamu kosong</p>';
-                return;
-            }
-            
-            playlist.forEach((song, index) => {
-                const playlistItem = document.createElement('div');
-                playlistItem.classList.add('playlist-item');
-                
-                playlistItem.innerHTML = `
-                    <div class="playlist-item-info">
-                        <div class="playlist-item-title">${song.title}</div>
-                        <div class="playlist-item-artist">${song.artist}</div>
-                    </div>
-                    <div class="playlist-item-actions">
-                        <button class="playlist-item-btn play-btn" data-id="${song.id}">
-                            <i class="fas fa-play"></i>
-                        </button>
-                        <button class="playlist-item-btn remove-btn" data-id="${song.id}">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </div>
-                `;
-                
-                // Play button
-                playlistItem.querySelector('.play-btn').addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    const songIndex = songs.findIndex(s => s.id === song.id);
-                    if (songIndex !== -1) {
-                        currentSongIndex = songIndex;
-                        loadSong(currentSongIndex);
-                        playSong();
-                        closePlaylistModal();
-                    }
-                });
-                
-                // Remove button
-                playlistItem.querySelector('.remove-btn').addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    removeFromPlaylist(song.id);
-                });
-                
-                playlistItems.appendChild(playlistItem);
-            });
-        }
-
-        // Remove from playlist
-        function removeFromPlaylist(songId) {
-            playlist = playlist.filter(item => item.id !== songId);
-            localStorage.setItem('musicPlayerPlaylist', JSON.stringify(playlist));
-            
-            // Update playlist modal
-            renderPlaylistModal();
-            
-            // Update add buttons in main list
-            const addButtons = document.querySelectorAll('.add-to-playlist');
-            addButtons.forEach(btn => {
-                if (btn.dataset.id === songId) {
-                    btn.classList.remove('active');
-                    btn.innerHTML = '<i class="fas fa-plus"></i>';
-                }
-            });
-        }
-
-        // Open playlist modal
-        function openPlaylistModal() {
-            playlistModal.style.display = 'block';
-        }
-
-        // Close playlist modal
-        function closePlaylistModal() {
-            playlistModal.style.display = 'none';
         }
 
         // Play song
@@ -1023,12 +772,8 @@ h1 {
             window.location.href = 'request.html';
         });
 
-        playlistBtn.addEventListener('click', openPlaylistModal);
-        closeModal.addEventListener('click', closePlaylistModal);
-        window.addEventListener('click', (e) => {
-            if (e.target === playlistModal) {
-                closePlaylistModal();
-            }
+        playlistBtn.addEventListener('click', () => {
+            window.location.href = 'playlist.html';
         });
 
         // Initialize
