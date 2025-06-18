@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Playlist - Dravin Music</title>
+    <title>My Playlist - Dravin Music</title>
+    <link rel="icon" type="image/png" href="favicon.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -101,8 +102,8 @@
         }
 
         .song-img {
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             border-radius: 5px;
             object-fit: cover;
         }
@@ -131,6 +132,10 @@
             color: var(--text-color);
             cursor: pointer;
             font-size: 1rem;
+        }
+
+        .action-btn:hover {
+            color: var(--primary-color);
         }
 
         /* Song Selection Modal */
@@ -215,80 +220,154 @@
             background-color: var(--control-bg);
         }
 
-        .preview-btn {
-            margin-left: auto;
-            color: var(--primary-color);
+        .select-song-item.active {
+            background-color: var(--primary-color);
+            color: white;
         }
 
-        /* Audio Player in Modal */
-        .audio-preview {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
+        .select-song-item.active .song-artist {
+            color: #ddd;
+        }
+
+        /* Now Playing Section */
+        .now-playing {
             background-color: var(--card-bg);
-            padding: 10px;
-            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
-            display: none;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
         }
 
-        .audio-preview audio {
-            width: 100%;
+        .now-playing-img {
+            width: 80px;
+            height: 80px;
+            border-radius: 5px;
+            object-fit: cover;
         }
 
-        .close-preview {
-            position: absolute;
-            right: 10px;
-            top: 10px;
+        .now-playing-info {
+            flex: 1;
+        }
+
+        .now-playing-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .now-playing-artist {
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+
+        .player-controls {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .play-btn {
+            background-color: var(--primary-color);
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
             cursor: pointer;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #777;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+            
+            .header-buttons {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            
+            .now-playing {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .player-controls {
+                justify-content: center;
+            }
         }
     </style>
 </head>
 <body>
     <header>
-        <h1>Playlist Saya</h1>
-        <div>
+        <h1>My Playlist</h1>
+        <div class="header-buttons">
             <button class="btn" id="backBtn">
-                <i class="fas fa-arrow-left"></i> Kembali
+                <i class="fas fa-arrow-left"></i> Back to Player
             </button>
             <button class="btn" id="addSongBtn">
-                <i class="fas fa-plus"></i> Tambah Lagu
+                <i class="fas fa-plus"></i> Add Songs
             </button>
             <button class="btn" id="themeToggle">
-                <i class="fas fa-moon"></i> Tema
+                <i class="fas fa-moon"></i> Theme
             </button>
         </div>
     </header>
 
-    <div class="playlist-container">
-        <div id="playlistSongs">
-            <!-- Daftar lagu di playlist akan muncul di sini -->
-            <p style="text-align: center;">Belum ada lagu di playlist</p>
+    <!-- Now Playing Section -->
+    <div class="now-playing" id="nowPlaying" style="display: none;">
+        <img id="nowPlayingImg" class="now-playing-img" src="" alt="Now Playing">
+        <div class="now-playing-info">
+            <div class="now-playing-title" id="nowPlayingTitle"></div>
+            <div class="now-playing-artist" id="nowPlayingArtist"></div>
+        </div>
+        <div class="player-controls">
+            <button class="play-btn" id="playBtn">
+                <i class="fas fa-play" id="playIcon"></i>
+            </button>
         </div>
     </div>
 
-    <!-- Modal untuk memilih lagu -->
+    <!-- Playlist Songs -->
+    <div class="playlist-container">
+        <div id="playlistSongs">
+            <!-- Playlist songs will be loaded here -->
+        </div>
+    </div>
+
+    <!-- Song Selection Modal -->
     <div class="modal" id="songModal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Pilih Lagu</h2>
+                <h2>Add Songs to Playlist</h2>
                 <span class="close-modal" id="closeModal">&times;</span>
             </div>
             <div class="search-box">
                 <i class="fas fa-search"></i>
-                <input type="text" id="searchSong" placeholder="Cari judul atau artis...">
+                <input type="text" id="searchSong" placeholder="Search by title or artist...">
             </div>
             <div class="song-list" id="allSongsList">
-                <!-- Daftar semua lagu akan muncul di sini -->
+                <!-- All available songs will be loaded here -->
             </div>
         </div>
     </div>
 
-    <!-- Audio preview -->
-    <div class="audio-preview" id="audioPreview">
-        <span class="close-preview" id="closePreview">&times;</span>
-        <audio controls id="previewAudio"></audio>
-    </div>
+    <audio id="audioPlayer"></audio>
 
     <script>
         // DOM Elements
@@ -300,74 +379,69 @@
         const searchSong = document.getElementById('searchSong');
         const allSongsList = document.getElementById('allSongsList');
         const playlistSongs = document.getElementById('playlistSongs');
-        const audioPreview = document.getElementById('audioPreview');
-        const previewAudio = document.getElementById('previewAudio');
-        const closePreview = document.getElementById('closePreview');
+        const nowPlaying = document.getElementById('nowPlaying');
+        const nowPlayingImg = document.getElementById('nowPlayingImg');
+        const nowPlayingTitle = document.getElementById('nowPlayingTitle');
+        const nowPlayingArtist = document.getElementById('nowPlayingArtist');
+        const playBtn = document.getElementById('playBtn');
+        const playIcon = document.getElementById('playIcon');
+        const audioPlayer = document.getElementById('audioPlayer');
 
         // State
         let allSongs = [];
         let playlist = JSON.parse(localStorage.getItem('playlist')) || [];
+        let currentPlayingIndex = -1;
+        let isPlaying = false;
 
         // Initialize
         function init() {
-            loadSongs();
+            loadAllSongs();
             renderPlaylist();
             checkTheme();
             setupEventListeners();
+            
+            // Show now playing if there's a song in playlist
+            if (playlist.length > 0) {
+                updateNowPlaying();
+            }
         }
 
-        // Load songs from JSON
-        async function loadSongs() {
+        // Load all available songs
+        async function loadAllSongs() {
             try {
                 const response = await fetch('songs.json');
                 if (!response.ok) throw new Error('Failed to load songs');
                 allSongs = await response.json();
-                renderSongList(allSongs);
             } catch (error) {
                 console.error('Error loading songs:', error);
-                allSongsList.innerHTML = '<p>Gagal memuat daftar lagu</p>';
+                allSongsList.innerHTML = '<p>Failed to load songs</p>';
             }
-        }
-
-        // Render song list in modal
-        function renderSongList(songs) {
-            allSongsList.innerHTML = '';
-            
-            if (songs.length === 0) {
-                allSongsList.innerHTML = '<p>Tidak ada lagu ditemukan</p>';
-                return;
-            }
-
-            songs.forEach(song => {
-                const songItem = document.createElement('div');
-                songItem.className = 'select-song-item';
-                songItem.innerHTML = `
-                    <img src="${song.thumbnail}" class="song-img" alt="${song.title}">
-                    <div>
-                        <div class="song-title">${song.title}</div>
-                        <div class="song-artist">${song.artist}</div>
-                    </div>
-                    <div class="song-duration">${song.duration}</div>
-                    <button class="preview-btn action-btn" data-src="${song.mp3}">
-                        <i class="fas fa-play"></i> Preview
-                    </button>
-                    <button class="btn" data-id="${song.id}">
-                        <i class="fas fa-plus"></i> Tambah
-                    </button>
-                `;
-                allSongsList.appendChild(songItem);
-            });
         }
 
         // Render playlist
         function renderPlaylist() {
             if (playlist.length === 0) {
-                playlistSongs.innerHTML = '<p style="text-align: center;">Belum ada lagu di playlist</p>';
+                playlistSongs.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-music" style="font-size: 3rem; margin-bottom: 15px;"></i>
+                        <h3>Your playlist is empty</h3>
+                        <p>Add some songs to get started</p>
+                        <button class="btn" id="addFirstSongBtn" style="margin-top: 15px;">
+                            <i class="fas fa-plus"></i> Add Songs
+                        </button>
+                    </div>
+                `;
+                
+                document.getElementById('addFirstSongBtn')?.addEventListener('click', () => {
+                    songModal.style.display = 'flex';
+                    renderSongSelection();
+                });
+                
                 return;
             }
 
             playlistSongs.innerHTML = '';
-            playlist.forEach(song => {
+            playlist.forEach((song, index) => {
                 const songItem = document.createElement('div');
                 songItem.className = 'song-item';
                 songItem.innerHTML = `
@@ -379,16 +453,121 @@
                         </div>
                     </div>
                     <div class="song-actions">
-                        <button class="action-btn" title="Putar">
+                        <button class="action-btn play-song-btn" data-index="${index}" title="Play">
                             <i class="fas fa-play"></i>
                         </button>
-                        <button class="action-btn" title="Hapus">
+                        <button class="action-btn remove-song-btn" data-index="${index}" title="Remove">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
                 `;
                 playlistSongs.appendChild(songItem);
             });
+        }
+
+        // Render song selection in modal
+        function renderSongSelection() {
+            allSongsList.innerHTML = '';
+            
+            if (allSongs.length === 0) {
+                allSongsList.innerHTML = '<p>No songs available</p>';
+                return;
+            }
+
+            allSongs.forEach(song => {
+                // Check if song is already in playlist
+                const isInPlaylist = playlist.some(s => s.id === song.id);
+                
+                const songItem = document.createElement('div');
+                songItem.className = `select-song-item ${isInPlaylist ? 'active' : ''}`;
+                songItem.innerHTML = `
+                    <img src="${song.thumbnail}" class="song-img" alt="${song.title}">
+                    <div class="song-details">
+                        <div class="song-title">${song.title}</div>
+                        <div class="song-artist">${song.artist}</div>
+                    </div>
+                    <div class="song-duration">${song.duration}</div>
+                    <button class="btn add-song-btn" data-id="${song.id}" ${isInPlaylist ? 'disabled' : ''}>
+                        <i class="fas fa-plus"></i> Add
+                    </button>
+                `;
+                allSongsList.appendChild(songItem);
+            });
+        }
+
+        // Update now playing section
+        function updateNowPlaying() {
+            if (currentPlayingIndex >= 0 && currentPlayingIndex < playlist.length) {
+                const song = playlist[currentPlayingIndex];
+                nowPlayingImg.src = song.thumbnail;
+                nowPlayingTitle.textContent = song.title;
+                nowPlayingArtist.textContent = song.artist;
+                audioPlayer.src = song.mp3;
+                nowPlaying.style.display = 'flex';
+            } else {
+                nowPlaying.style.display = 'none';
+            }
+        }
+
+        // Play song from playlist
+        function playSong(index) {
+            if (index >= 0 && index < playlist.length) {
+                currentPlayingIndex = index;
+                updateNowPlaying();
+                audioPlayer.play();
+                isPlaying = true;
+                playIcon.classList.replace('fa-play', 'fa-pause');
+            }
+        }
+
+        // Toggle play/pause
+        function togglePlayPause() {
+            if (currentPlayingIndex === -1 && playlist.length > 0) {
+                playSong(0);
+                return;
+            }
+            
+            if (isPlaying) {
+                audioPlayer.pause();
+                isPlaying = false;
+                playIcon.classList.replace('fa-pause', 'fa-play');
+            } else {
+                audioPlayer.play();
+                isPlaying = true;
+                playIcon.classList.replace('fa-play', 'fa-pause');
+            }
+        }
+
+        // Add song to playlist
+        function addToPlaylist(songId) {
+            const songToAdd = allSongs.find(song => song.id === songId);
+            if (songToAdd && !playlist.some(song => song.id === songId)) {
+                playlist.push(songToAdd);
+                localStorage.setItem('playlist', JSON.stringify(playlist));
+                renderPlaylist();
+                
+                // If this is the first song added, play it
+                if (playlist.length === 1) {
+                    playSong(0);
+                }
+            }
+        }
+
+        // Remove song from playlist
+        function removeFromPlaylist(index) {
+            if (index >= 0 && index < playlist.length) {
+                // If we're removing the currently playing song, stop playback
+                if (index === currentPlayingIndex) {
+                    audioPlayer.pause();
+                    currentPlayingIndex = -1;
+                    isPlaying = false;
+                    nowPlaying.style.display = 'none';
+                }
+                
+                playlist.splice(index, 1);
+                localStorage.setItem('playlist', JSON.stringify(playlist));
+                renderPlaylist();
+            }
         }
 
         // Search songs
@@ -398,7 +577,32 @@
                 song.title.toLowerCase().includes(term) || 
                 song.artist.toLowerCase().includes(term)
             );
-            renderSongList(filtered);
+            
+            allSongsList.innerHTML = '';
+            
+            if (filtered.length === 0) {
+                allSongsList.innerHTML = '<p>No songs found</p>';
+                return;
+            }
+
+            filtered.forEach(song => {
+                const isInPlaylist = playlist.some(s => s.id === song.id);
+                
+                const songItem = document.createElement('div');
+                songItem.className = `select-song-item ${isInPlaylist ? 'active' : ''}`;
+                songItem.innerHTML = `
+                    <img src="${song.thumbnail}" class="song-img" alt="${song.title}">
+                    <div class="song-details">
+                        <div class="song-title">${song.title}</div>
+                        <div class="song-artist">${song.artist}</div>
+                    </div>
+                    <div class="song-duration">${song.duration}</div>
+                    <button class="btn add-song-btn" data-id="${song.id}" ${isInPlaylist ? 'disabled' : ''}>
+                        <i class="fas fa-plus"></i> Add
+                    </button>
+                `;
+                allSongsList.appendChild(songItem);
+            });
         }
 
         // Toggle theme
@@ -420,10 +624,10 @@
             const icon = themeToggle.querySelector('i');
             if (document.body.classList.contains('dark-mode')) {
                 icon.classList.replace('fa-moon', 'fa-sun');
-                themeToggle.innerHTML = '<i class="fas fa-sun"></i> Tema';
+                themeToggle.innerHTML = '<i class="fas fa-sun"></i> Light Mode';
             } else {
                 icon.classList.replace('fa-sun', 'fa-moon');
-                themeToggle.innerHTML = '<i class="fas fa-moon"></i> Tema';
+                themeToggle.innerHTML = '<i class="fas fa-moon"></i> Dark Mode';
             }
         }
 
@@ -431,7 +635,10 @@
         function setupEventListeners() {
             // Navigation
             backBtn.addEventListener('click', () => window.location.href = 'index.html');
-            addSongBtn.addEventListener('click', () => songModal.style.display = 'flex');
+            addSongBtn.addEventListener('click', () => {
+                songModal.style.display = 'flex';
+                renderSongSelection();
+            });
             closeModal.addEventListener('click', () => songModal.style.display = 'none');
             
             // Theme toggle
@@ -440,35 +647,45 @@
             // Search
             searchSong.addEventListener('input', searchSongs);
             
-            // Song selection
-            allSongsList.addEventListener('click', (e) => {
-                // Preview song
-                if (e.target.closest('.preview-btn')) {
-                    const btn = e.target.closest('.preview-btn');
-                    const audioSrc = btn.getAttribute('data-src');
-                    previewAudio.src = audioSrc;
-                    audioPreview.style.display = 'block';
-                    previewAudio.play();
+            // Playlist actions
+            playlistSongs.addEventListener('click', (e) => {
+                // Play song
+                if (e.target.closest('.play-song-btn')) {
+                    const btn = e.target.closest('.play-song-btn');
+                    const index = parseInt(btn.getAttribute('data-index'));
+                    playSong(index);
                 }
                 
-                // Add to playlist
-                if (e.target.closest('.btn') && !e.target.closest('.preview-btn')) {
-                    const btn = e.target.closest('.btn');
-                    const songId = btn.getAttribute('data-id');
-                    const songToAdd = allSongs.find(song => song.id == songId);
-                    
-                    if (songToAdd && !playlist.some(song => song.id == songId)) {
-                        playlist.push(songToAdd);
-                        localStorage.setItem('playlist', JSON.stringify(playlist));
-                        renderPlaylist();
-                    }
+                // Remove song
+                if (e.target.closest('.remove-song-btn')) {
+                    const btn = e.target.closest('.remove-song-btn');
+                    const index = parseInt(btn.getAttribute('data-index'));
+                    removeFromPlaylist(index);
                 }
             });
             
-            // Close preview
-            closePreview.addEventListener('click', () => {
-                previewAudio.pause();
-                audioPreview.style.display = 'none';
+            // Add song to playlist
+            allSongsList.addEventListener('click', (e) => {
+                if (e.target.closest('.add-song-btn')) {
+                    const btn = e.target.closest('.add-song-btn');
+                    const songId = btn.getAttribute('data-id');
+                    addToPlaylist(songId);
+                    btn.disabled = true;
+                    btn.closest('.select-song-item').classList.add('active');
+                }
+            });
+            
+            // Play/pause button
+            playBtn.addEventListener('click', togglePlayPause);
+            
+            // Handle song ending
+            audioPlayer.addEventListener('ended', () => {
+                if (currentPlayingIndex < playlist.length - 1) {
+                    playSong(currentPlayingIndex + 1);
+                } else {
+                    isPlaying = false;
+                    playIcon.classList.replace('fa-pause', 'fa-play');
+                }
             });
             
             // Close modal when clicking outside
