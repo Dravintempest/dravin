@@ -346,8 +346,7 @@
     </div>
 
     <div class="playlist-container">
-        <div id="playlistSongs">
-            </div>
+        <div id="playlistSongs"></div>
     </div>
 
     <div class="modal" id="songModal">
@@ -360,8 +359,7 @@
                 <i class="fas fa-search"></i>
                 <input type="text" id="searchSong" placeholder="Search by title or artist...">
             </div>
-            <div class="song-list" id="allSongsList">
-                </div>
+            <div class="song-list" id="allSongsList"></div>
         </div>
     </div>
 
@@ -384,7 +382,7 @@
         const playBtn = document.getElementById('playBtn');
         const playIcon = document.getElementById('playIcon');
         const audioPlayer = document.getElementById('audioPlayer');
-        const requestBtn = document.getElementById('requestBtn'); // Added this
+        const requestBtn = document.getElementById('requestBtn');
 
         // State
         let allSongs = [];
@@ -411,6 +409,7 @@
                 const response = await fetch('songs.json');
                 if (!response.ok) throw new Error('Failed to load songs');
                 allSongs = await response.json();
+                renderSongSelection(); // Render songs after loading
             } catch (error) {
                 console.error('Error loading songs:', error);
                 allSongsList.innerHTML = '<p>Failed to load songs</p>';
@@ -544,7 +543,7 @@
                 playlist.push(songToAdd);
                 localStorage.setItem('playlist', JSON.stringify(playlist));
                 renderPlaylist();
-                renderSongSelection(); // Crucial addition to re-render modal content
+                renderSongSelection(); // Re-render modal to update add buttons
                 
                 // If this is the first song added, play it
                 if (playlist.length === 1) {
@@ -567,7 +566,7 @@
                 playlist.splice(index, 1);
                 localStorage.setItem('playlist', JSON.stringify(playlist));
                 renderPlaylist();
-                renderSongSelection(); // Important: Re-render modal to enable "Add" button again
+                renderSongSelection(); // Re-render modal to update add buttons
             }
         }
 
@@ -636,7 +635,7 @@
         function setupEventListeners() {
             // Navigation
             backBtn.addEventListener('click', () => window.location.href = 'index.html');
-            requestBtn.addEventListener('click', () => window.location.href = 'request.html'); // Added this
+            requestBtn.addEventListener('click', () => window.location.href = 'request.html');
             addSongBtn.addEventListener('click', () => {
                 songModal.style.display = 'flex';
                 renderSongSelection();
@@ -670,12 +669,10 @@
             allSongsList.addEventListener('click', (e) => {
                 if (e.target.closest('.add-song-btn')) {
                     const btn = e.target.closest('.add-song-btn');
-                    const songId = btn.getAttribute('data-id');
-                    addToPlaylist(songId);
-                    // The button disable and active class addition is now handled by renderSongSelection()
-                    // So these two lines are no longer strictly necessary here, but don't hurt:
-                    // btn.disabled = true;
-                    // btn.closest('.select-song-item').classList.add('active');
+                    if (!btn.disabled) {
+                        const songId = btn.getAttribute('data-id');
+                        addToPlaylist(songId);
+                    }
                 }
             });
             
