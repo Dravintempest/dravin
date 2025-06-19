@@ -1,0 +1,990 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+:root {
+  --neon-blue: #0ff;
+  --neon-pink: #f0f;
+  --neon-purple: #9d00ff;
+  --neon-green: #00ff41;
+  --dark-bg: #111;
+  --panel-bg: rgba(20, 20, 30, 0.9);
+  --panel-border: #444;
+  --glow: 0 0 10px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--dark-bg);
+  color: white;
+  font-family: 'Share Tech Mono', monospace;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+  position: relative;
+  background-image: radial-gradient(circle at 20% 30%, rgba(15, 255, 255, 0.05) 0%, transparent 20%),
+                    radial-gradient(circle at 80% 70%, rgba(255, 0, 255, 0.05) 0%, transparent 20%);
+}
+
+.matrix-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  opacity: 0.15;
+}
+
+.scanlines {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(to bottom, rgba(0, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 100% 3px;
+  pointer-events: none;
+  z-index: 100;
+  animation: scanline 8s linear infinite;
+}
+
+.intro-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 10;
+}
+
+.intro-container.move-up {
+  top: 20px;
+  transform: translateX(-50%);
+  transition: all 1s ease-out;
+}
+
+.intro {
+  text-align: center;
+  perspective: 1000px;
+}
+
+.intro h1 {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 1.8rem;
+  margin-bottom: 15px;
+  color: var(--neon-blue);
+  text-shadow: var(--glow) var(--neon-blue);
+  opacity: 0;
+  animation: fadeIn 0.5s forwards, float 3s ease-in-out infinite;
+  letter-spacing: 2px;
+}
+
+.intro h2 {
+  font-size: 3.5rem;
+  font-weight: 900;
+  background: linear-gradient(90deg, var(--neon-blue), var(--neon-pink), var(--neon-purple));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-shadow: 0 0 15px rgba(157, 0, 255, 0.5);
+  opacity: 0;
+  animation: fadeIn 0.5s forwards 0.5s, pulse 4s ease-in-out infinite;
+  letter-spacing: 3px;
+}
+
+.hack-container {
+  width: 90%;
+  max-width: 600px;
+  background: var(--panel-bg);
+  border: 1px solid var(--panel-border);
+  border-radius: 8px;
+  padding: 25px;
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.2), 0 0 30px rgba(255, 0, 255, 0.1);
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 1s, transform 1s;
+  position: relative;
+  overflow: hidden;
+}
+
+.hack-container::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    to bottom right,
+    rgba(0, 255, 255, 0) 0%,
+    rgba(0, 255, 255, 0) 40%,
+    rgba(0, 255, 255, 0.1) 50%,
+    rgba(0, 255, 255, 0) 60%,
+    rgba(0, 255, 255, 0) 100%
+  );
+  transform: rotate(30deg);
+  animation: shine 6s infinite;
+}
+
+.hack-container.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.terminal {
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid #333;
+  border-radius: 5px;
+  padding: 15px;
+  font-family: 'Share Tech Mono', monospace;
+  height: 250px;
+  overflow-y: auto;
+  margin-bottom: 20px;
+  position: relative;
+  box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+  border-image: linear-gradient(to right, var(--neon-blue), var(--neon-pink)) 1;
+}
+
+.terminal::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--neon-blue), transparent);
+  animation: terminalGlow 3s infinite;
+}
+
+.terminal-line {
+  color: var(--neon-green);
+  margin-bottom: 5px;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+  text-shadow: 0 0 5px var(--neon-green);
+  line-height: 1.4;
+}
+
+.terminal-line::before {
+  content: '> ';
+  color: var(--neon-blue);
+}
+
+.terminal-error {
+  color: #ff3e3e;
+  margin-top: 10px;
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+  text-shadow: 0 0 5px #ff3e3e;
+}
+
+.terminal-error::before {
+  content: '! ';
+}
+
+.input-group {
+  margin-bottom: 20px;
+  display: none;
+}
+
+.button-group {
+  display: none;
+  gap: 15px;
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--neon-blue);
+  font-size: 0.9rem;
+  letter-spacing: 1px;
+}
+
+input {
+  width: 100%;
+  padding: 12px 15px;
+  background: rgba(0, 0, 0, 0.7);
+  border: 1px solid #333;
+  border-radius: 5px;
+  color: white;
+  font-family: 'Share Tech Mono', monospace;
+  font-size: 0.9rem;
+  transition: all 0.3s;
+  letter-spacing: 1px;
+}
+
+input:focus {
+  outline: none;
+  border-color: var(--neon-blue);
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+}
+
+.btn {
+  background: linear-gradient(to right, #222, #333);
+  color: white;
+  border: 1px solid var(--panel-border);
+  padding: 12px 25px;
+  font-family: 'Share Tech Mono', monospace;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+}
+
+.btn:hover {
+  background: linear-gradient(to right, #333, #444);
+  border-color: var(--neon-blue);
+  box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+}
+
+.btn::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(
+    to bottom right,
+    rgba(0, 255, 255, 0) 0%,
+    rgba(0, 255, 255, 0) 40%,
+    rgba(0, 255, 255, 0.3) 50%,
+    rgba(0, 255, 255, 0) 60%,
+    rgba(0, 255, 255, 0) 100%
+  );
+  transform: rotate(30deg);
+  animation: shine 6s infinite;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.btn:hover::after {
+  opacity: 1;
+}
+
+#hackBtn {
+  background: linear-gradient(to right, #006466, #065a60);
+  border-color: var(--neon-blue);
+}
+
+#resetBtn {
+  background: linear-gradient(to right, #4d194d, #3a1e3a);
+  border-color: var(--neon-pink);
+}
+
+.result {
+  margin-top: 20px;
+  padding: 20px;
+  background: rgba(0, 0, 0, 0.8);
+  border: 1px solid var(--panel-border);
+  border-radius: 5px;
+  display: none;
+  position: relative;
+  overflow: hidden;
+  border-image: linear-gradient(to right, var(--neon-blue), var(--neon-pink)) 1;
+}
+
+.result::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(to right, transparent, var(--neon-pink), transparent);
+  animation: terminalGlow 3s infinite reverse;
+}
+
+.result.show {
+  display: block;
+  animation: fadeIn 0.5s;
+}
+
+.password-display {
+  font-family: 'Share Tech Mono', monospace;
+  color: var(--neon-green);
+  margin: 15px 0;
+  word-break: break-all;
+  padding: 10px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px dashed var(--neon-blue);
+  border-radius: 3px;
+  position: relative;
+  text-shadow: 0 0 5px var(--neon-green);
+}
+
+.copy-btn {
+  background: rgba(0, 0, 0, 0.7);
+  color: var(--neon-blue);
+  border: 1px solid var(--neon-blue);
+  padding: 8px 15px;
+  border-radius: 3px;
+  cursor: pointer;
+  margin-left: 10px;
+  font-family: 'Share Tech Mono', monospace;
+  transition: all 0.3s;
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  letter-spacing: 1px;
+}
+
+.copy-btn:hover {
+  background: rgba(0, 255, 255, 0.1);
+  box-shadow: 0 0 8px rgba(0, 255, 255, 0.3);
+}
+
+.progress-container {
+  width: 100%;
+  height: 8px;
+  background: #222;
+  border-radius: 4px;
+  margin: 25px 0;
+  overflow: hidden;
+  display: none;
+  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.5);
+}
+
+.progress-bar {
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, var(--neon-blue), var(--neon-pink), var(--neon-purple));
+  transition: width 0.3s;
+  position: relative;
+}
+
+.progress-bar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    to right,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  animation: progressShine 2s infinite;
+}
+
+.scanning {
+  color: var(--neon-blue);
+  text-align: center;
+  margin: 15px 0;
+  display: none;
+  font-family: 'Share Tech Mono', monospace;
+  letter-spacing: 2px;
+  text-shadow: 0 0 5px var(--neon-blue);
+  position: relative;
+}
+
+.scanning::after {
+  content: '...';
+  animation: dots 1.5s infinite steps(3);
+  display: inline-block;
+  width: 0;
+}
+
+.ascii-art {
+  font-family: monospace;
+  white-space: pre;
+  color: var(--neon-blue);
+  text-align: center;
+  margin: 15px 0;
+  display: none;
+  text-shadow: 0 0 5px var(--neon-blue);
+  line-height: 1.3;
+  font-size: 0.7rem;
+}
+
+.corner {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border-width: 3px;
+  border-style: solid;
+  border-color: transparent;
+}
+
+.corner-tl {
+  top: 10px;
+  left: 10px;
+  border-top-color: var(--neon-blue);
+  border-left-color: var(--neon-blue);
+}
+
+.corner-tr {
+  top: 10px;
+  right: 10px;
+  border-top-color: var(--neon-pink);
+  border-right-color: var(--neon-pink);
+}
+
+.corner-bl {
+  bottom: 10px;
+  left: 10px;
+  border-bottom-color: var(--neon-blue);
+  border-left-color: var(--neon-blue);
+}
+
+.corner-br {
+  bottom: 10px;
+  right: 10px;
+  border-bottom-color: var(--neon-pink);
+  border-right-color: var(--neon-pink);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse {
+  0%, 100% { text-shadow: 0 0 15px rgba(157, 0, 255, 0.5); }
+  50% { text-shadow: 0 0 25px rgba(157, 0, 255, 0.8); }
+}
+
+@keyframes shine {
+  0% { left: -100%; }
+  20% { left: 100%; }
+  100% { left: 100%; }
+}
+
+@keyframes progressShine {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+@keyframes terminalGlow {
+  0% { opacity: 0.3; width: 0; left: 0; }
+  50% { opacity: 1; width: 100%; }
+  100% { opacity: 0; width: 0; left: 100%; }
+}
+
+@keyframes dots {
+  0%, 20% { content: '.'; }
+  40% { content: '..'; }
+  60%, 100% { content: '...'; }
+}
+
+@keyframes scanline {
+  0% { background-position: 0 0; }
+  100% { background-position: 0 100%; }
+}
+
+@keyframes flicker {
+  0%, 19.999%, 22%, 62.999%, 64%, 64.999%, 70%, 100% { opacity: 1; }
+  20%, 21.999%, 63%, 63.999%, 65%, 69.999% { opacity: 0.4; }
+}
+</style>
+</head>
+<body>
+<canvas class="matrix-bg" id="matrixCanvas"></canvas>
+<div class="scanlines"></div>
+
+<div class="intro-container" id="introContainer">
+  <div class="intro">
+    <h1 id="webByText">CYBER TOOL</h1>
+    <h2 id="dravinText">D4RK H4X0R</h2>
+  </div>
+</div>
+
+<div class="hack-container" id="hackContainer">
+  <div class="corner corner-tl"></div>
+  <div class="corner corner-tr"></div>
+  <div class="corner corner-bl"></div>
+  <div class="corner corner-br"></div>
+  
+  <div class="terminal" id="terminal">
+    <div class="terminal-line">Initializing FF Account Tool v4.0.2...</div>
+    <div class="terminal-line">Checking system compatibility...</div>
+    <div class="terminal-line">Bypassing security protocols...</div>
+    <div class="terminal-line">Establishing connection to FF servers...</div>
+    <div class="ascii-art" id="asciiArt">
+  ____  _____ ____  _   _  ____ _____ 
+ / ___||  ___/ ___|| | | |/ ___| ____|
+ \___ \| |_  \___ \| |_| | |   |  _|  
+  ___) |  _|  ___) |  _  | |___| |___ 
+ |____/|_|   |____/|_| |_|\____|_____|
+    </div>
+    <div class="terminal-line" style="color: var(--neon-blue)">SYSTEM READY</div>
+  </div>
+  
+  <div class="input-group" id="inputGroup">
+    <label for="email">TARGET email:</label>
+    <input type="text" id="email" placeholder="Enter target Free Fire account email (e.g., example@gmail.com)">
+  </div>
+  
+  <div class="button-group" id="buttonGroup">
+    <button class="btn" id="hackBtn">EXECUTE</button>
+    <button class="btn" id="resetBtn">RESET</button>
+  </div>
+  
+  <div class="progress-container" id="progressContainer">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+  
+  <div class="scanning" id="scanningText">
+    SCANNING DATABASE
+  </div>
+  
+  <div class="result" id="result">
+    <h3 style="color: lime;" id="resultStatus">ACCESS GRANTED</h3>
+    <p id="accountInfo">TARGET: <span id="resultEmail"></span></p>
+    <div class="password-display" id="passwordDisplayGroup">
+      CREDENTIALS: <span id="passwordResult"></span>
+      <button class="copy-btn" id="copyBtn">COPY</button>
+    </div>
+    <p style="color: #ccc; font-size: 0.8rem; margin-top: 15px;">
+       [ D4RK_H4X0R_TOOLS_v4.0.2 ]
+         {[ Tools By Dravin ]}
+    </p>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Enhanced Matrix background
+  const canvas = document.getElementById('matrixCanvas');
+  const ctx = canvas.getContext('2d');
+  
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  
+  resizeCanvas();
+  
+  const katakana = 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリヰギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレヱゲゼデベペオォコソトノホモヨョロヲゴゾドボポヴッン';
+  const latin = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  const nums = '0123456789';
+  const symbols = '!"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~';
+  const alphabet = katakana + latin + nums + symbols;
+  
+  const fontSize = 16;
+  const columns = Math.floor(canvas.width / fontSize);
+  
+  // Set the canvas size and adjust for device pixel ratio
+  function setupCanvas() {
+    const dpr = window.devicePixelRatio || 1;
+    const rect = canvas.getBoundingClientRect();
+    canvas.width = rect.width * dpr;
+    canvas.height = rect.height * dpr;
+    ctx.scale(dpr, dpr);
+  }
+  
+  setupCanvas();
+  
+  const rainDrops = [];
+  for (let i = 0; i < columns; i++) {
+    rainDrops[i] = {
+      y: Math.random() * -canvas.height,
+      length: Math.floor(Math.random() * 15) + 5,
+      speed: Math.random() * 5 + 3
+    };
+  }
+  
+  function drawMatrix() {
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+    ctx.fillStyle = '#0f0';
+    ctx.font = fontSize + 'px monospace';
+    
+    for (let i = 0; i < rainDrops.length; i++) {
+      const text = alphabet.charAt(Math.floor(Math.random() * alphabet.length));
+      
+      // Head character is brighter
+      ctx.fillStyle = `hsl(120, 100%, ${Math.random() * 30 + 50}%)`;
+      ctx.fillText(text, i * fontSize, rainDrops[i].y);
+      
+      // Trail characters
+      ctx.fillStyle = 'rgba(0, 255, 0, 0.5)';
+      for (let j = 1; j < rainDrops[i].length; j++) {
+        const char = alphabet.charAt(Math.floor(Math.random() * alphabet.length));
+        ctx.fillText(char, i * fontSize, (rainDrops[i].y - j * fontSize));
+      }
+      
+      rainDrops[i].y += rainDrops[i].speed;
+      
+      if (rainDrops[i].y > canvas.height + rainDrops[i].length * fontSize) {
+        rainDrops[i].y = Math.random() * -100;
+        rainDrops[i].length = Math.floor(Math.random() * 15) + 5;
+        rainDrops[i].speed = Math.random() * 5 + 3;
+      }
+    }
+  }
+  
+  const matrixInterval = setInterval(drawMatrix, 33);
+  
+  // UI elements
+  const introContainer = document.getElementById('introContainer');
+  const webByText = document.getElementById('webByText');
+  const dravinText = document.getElementById('dravinText');
+  const hackContainer = document.getElementById('hackContainer');
+  const terminal = document.getElementById('terminal');
+  const initialTerminalLines = document.querySelectorAll('.terminal-line');
+  const inputGroup = document.getElementById('inputGroup');
+  const buttonGroup = document.getElementById('buttonGroup');
+  const asciiArt = document.getElementById('asciiArt');
+  
+  // Password options
+  const passwords = [
+    "FreeFireGamer2024",
+    "BooyahChampionFF",
+    "DravinProPlayer",
+    "LegendarySquad99",
+    "HeadshotHero77",
+    "VictoryRoyaleFF",
+    "ElitePassMaster",
+    "DiamondHunterGo",
+    "KarakterKelly12",
+    "AldoSangJagoan",
+    "ffplayer1990",
+    "akunff2001",
+    "passwordku123",
+    "gamingindo45",
+    "booyahselalu",
+    "FreeFire#2025!",
+    "LegendaryFF_Pro",
+    "DiamondKing$",
+    "ProPlayer_FF",
+    "BooyahWinNow",
+    "GamerSejati123",
+    "IndonesiaMajuFF",
+    "AkunVIP_FF",
+    "SquadGoals2024",
+    "JagoanMabarFF",
+    "BudiSantoso1985",
+    "DewiLestari2000",
+    "JokoSusilo77",
+    "SitiAminah99",
+    "AndiWijaya123",
+    "IndonesiaMaju!",
+    "RumahKita123",
+    "RahasiaPribadi",
+    "Liburan2024",
+    "SeninPagi07",
+    "user1990",
+    "password2023",
+    "akunbaru111",
+    "rahasia007",
+    "admin12345",
+    "JakartaPusat#",
+    "BandungKotaKu",
+    "SurabayaHebat!",
+    "BaliIndah2025",
+    "YogyaSelalu",
+    "KopiSusu_22",
+    "MejaKursi#33",
+    "BukuPena@44",
+    "LangitBumi55",
+    "GelapTerang66",
+    "Andi12345",
+    "Siti_2002",
+    "BudiRumah01",
+    "DewiCantik!",
+    "Jakarta2023",
+    "SeninPagi07",
+    "MejaKursi88",
+    "Liburan2024",
+    "RahasiaSaya77",
+    "AkunBaru123",
+    "AdminSaya99",
+    "MotorBaru#1",
+    "BukuFavorit55",
+    "AyamGeprek09",
+    "LaptopSaya20",
+    "HaloDunia@21",
+    "MatahariTerbit7",
+    "KopiPagi22!",
+    "Pelangi123",
+    "TamanIndah_02",
+    "SemangatPagi",
+    "TidurNyenyak44",
+    "LangitBiru76",
+    "HujanGerimis55",
+    "KucingOren07",
+    "DompetLupa12",
+    "IbuMasakEnak",
+    "RotiBakar2020",
+    "SayangAnak99",
+    "JalanKaki#3",
+    "PintuTerkunci!",
+    "TVRusak88",
+    "MobilPutih01",
+    "WarnaFavorit",
+    "BangunSiang77",
+    "TidurCepat08",
+    "CoklatManis44",
+    "MinumAir07",
+    "HandukBiru12",
+    "TopiBundar09",
+    "SandalJepit66",
+    "JamTangan07",
+    "KacaMata2024",
+    "DompetKetinggalan",
+    "KeyboardBaru123",
+    "PrinterError45",
+    "SarapanNasiGoreng",
+    "SepatuLari2025",
+    "AirMataBahagia",
+    "CerminBesar@2",
+    "LemariEs_98",
+    "CyberHack2024!",
+    "DarkWebAccess",
+    "ShadowProtocol",
+    "NeonRainbow#",
+    "Binary0101",
+    "FirewallBypass",
+    "RootAccess777",
+    "KaliLinuxRulez",
+    "Metasploit42",
+    "WifiHacker99",
+    "VPNMaster123",
+    "TorBrowser456",
+    "EncryptedPass",
+    "ZeroDayExploit",
+    "SQLInjection",
+    "XSSAttack2024",
+    "BruteForce123",
+    "PhishingKing",
+    "MalwareMaker",
+    "Ransomware666",
+    "BotnetControl",
+    "DDoSMaster",
+    "KeyloggerPro",
+    "Spyware2024",
+    "TrojanHorse",
+    "WormVirus123",
+    "BackdoorAccess"
+  ];
+  
+  function addTerminalLine(text, color = 'var(--neon-green)', isError = false) {
+    const newLine = document.createElement('div');
+    newLine.textContent = text;
+    newLine.classList.add(isError ? 'terminal-error' : 'terminal-line');
+    if (color) newLine.style.color = color;
+    newLine.style.opacity = 0;
+    terminal.appendChild(newLine);
+    terminal.scrollTop = terminal.scrollHeight;
+    setTimeout(() => {
+      newLine.style.opacity = 1;
+    }, 50);
+    
+    if (isError) {
+      setTimeout(() => {
+        newLine.style.opacity = 0;
+        newLine.addEventListener('transitionend', () => {
+          newLine.remove();
+        }, { once: true });
+      }, 3000);
+    }
+    
+    return newLine;
+  }
+  
+  // Initial sequence
+  setTimeout(() => {
+    webByText.style.animation = 'fadeIn 0.5s forwards, flicker 6s infinite';
+    
+    setTimeout(() => {
+      dravinText.style.animation = 'fadeIn 0.5s forwards, pulse 4s ease-in-out infinite';
+      
+      setTimeout(() => {
+        introContainer.classList.add('move-up');
+        
+        setTimeout(() => {
+          hackContainer.classList.add('show');
+          startTerminalSequence();
+        }, 1000);
+      }, 1500);
+    }, 800);
+  }, 500);
+  
+  function startTerminalSequence() {
+    let currentLineIndex = 0;
+    const predefinedLines = [
+      "Initializing D4RK_H4X0R_TOOLS v4.0.2",
+      "Checking system compatibility...",
+      "Bypassing security protocols...",
+      "Establishing connection to FF servers...",
+    ];
+    
+    function showNextLine() {
+      if (currentLineIndex < predefinedLines.length) {
+        addTerminalLine(predefinedLines[currentLineIndex]);
+        currentLineIndex++;
+        setTimeout(showNextLine, 800 + Math.random() * 400);
+      } else {
+        setTimeout(() => {
+          asciiArt.style.display = 'block';
+          addTerminalLine('SYSTEM READY', 'var(--neon-blue)');
+          
+          setTimeout(() => {
+            inputGroup.style.display = 'block';
+            buttonGroup.style.display = 'flex';
+          }, 500);
+        }, 500);
+      }
+    }
+    
+    showNextLine();
+  }
+  
+  // Button functionality
+  const hackBtn = document.getElementById('hackBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  const copyBtn = document.getElementById('copyBtn');
+  const emailInput = document.getElementById('email');
+  const resultDiv = document.getElementById('result');
+  const resultStatus = document.getElementById('resultStatus');
+  const resultEmail = document.getElementById('resultEmail');
+  const passwordResult = document.getElementById('passwordResult');
+  const passwordDisplayGroup = document.getElementById('passwordDisplayGroup');
+  const progressContainer = document.getElementById('progressContainer');
+  const progressBar = document.getElementById('progressBar');
+  const scanningText = document.getElementById('scanningText');
+  
+  hackBtn.addEventListener('click', function() {
+    const email = emailInput.value.trim();
+    
+    // Clear any previous error messages
+    const existingError = terminal.querySelector('.terminal-error');
+    if (existingError) {
+      existingError.style.opacity = 0;
+      existingError.addEventListener('transitionend', () => {
+        existingError.remove();
+      }, { once: true });
+    }
+    
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!email) {
+      addTerminalLine('ERROR: Please enter a target email!', '#ff3e3e', true);
+      return;
+    }
+    
+    if (!emailRegex.test(email)) {
+      addTerminalLine('ERROR: Invalid email format! Must be in format: example@gmail.com', '#ff3e3e', true);
+      return;
+    }
+    
+    // Start hacking sequence
+    resultDiv.classList.remove('show');
+    progressContainer.style.display = 'block';
+    scanningText.style.display = 'block';
+    progressBar.style.width = '0';
+    
+    // Add terminal lines during process
+    addTerminalLine(`TARGET ACQUIRED: ${email}`);
+    addTerminalLine('INITIATING DATABASE SCAN...');
+    
+    let progress = 0;
+    const interval = setInterval(() => {
+      progress += Math.random() * 8;
+      progressBar.style.width = Math.min(progress, 100) + '%';
+      
+      // Random terminal updates during progress
+      if (progress % 25 < 2 && progress < 100) {
+        const messages = [
+          'Scanning user profiles...',
+          'Bypassing encryption...',
+          'Accessing password hashes...',
+          'Decrypting credentials...',
+          'Locating target data...'
+        ];
+        addTerminalLine(messages[Math.floor(Math.random() * messages.length)]);
+      }
+      
+      if (progress >= 100) {
+        clearInterval(interval);
+        setTimeout(() => {
+          scanningText.style.display = 'none';
+          showResult(email);
+        }, 500);
+      }
+    }, 200);
+    
+    function showResult(targetEmail) {
+      resultEmail.textContent = targetEmail;
+      
+      if (targetEmail.toLowerCase() === 'hackerff123@gmail.com') {
+        resultStatus.textContent = 'ACCESS DENIED';
+        resultStatus.style.color = '#ff3e3e';
+        passwordDisplayGroup.style.display = 'none';
+        addTerminalLine('ERROR: Target account not found in database!', '#ff3e3e');
+      } else {
+        resultStatus.textContent = 'ACCESS GRANTED';
+        resultStatus.style.color = 'var(--neon-green)';
+        passwordDisplayGroup.style.display = 'block';
+        const randomPassword = passwords[Math.floor(Math.random() * passwords.length)];
+        passwordResult.textContent = randomPassword;
+        addTerminalLine('SUCCESS: Credentials extracted!', 'var(--neon-green)');
+        addTerminalLine(`PASSWORD: ${randomPassword}`, 'var(--neon-blue)');
+      }
+      
+      resultDiv.classList.add('show');
+    }
+  });
+  
+  resetBtn.addEventListener('click', function() {
+    emailInput.value = '';
+    resultDiv.classList.remove('show');
+    progressContainer.style.display = 'none';
+    scanningText.style.display = 'none';
+    progressBar.style.width = '0';
+    copyBtn.textContent = 'COPY';
+    
+    const existingError = terminal.querySelector('.terminal-error');
+    if (existingError) {
+      existingError.style.opacity = 0;
+      existingError.addEventListener('transitionend', () => {
+        existingError.remove();
+      }, { once: true });
+    }
+    
+    addTerminalLine('SYSTEM RESET COMPLETE', 'var(--neon-blue)');
+  });
+  
+  copyBtn.addEventListener('click', function() {
+    const password = passwordResult.textContent;
+    navigator.clipboard.writeText(password).then(() => {
+      copyBtn.textContent = 'COPIED!';
+      copyBtn.style.color = 'var(--neon-green)';
+      setTimeout(() => {
+        copyBtn.textContent = 'COPY';
+        copyBtn.style.color = 'var(--neon-blue)';
+      }, 2000);
+    });
+  });
+  
+  // Handle window resize
+  window.addEventListener('resize', function() {
+    resizeCanvas();
+    setupCanvas();
+  });
+});
+</script>
+</body>
+</html>
