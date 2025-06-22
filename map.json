@@ -1,0 +1,26 @@
+{
+  "maps": [
+    {
+      "name": "Forest Adventure",
+      "thumbnail": "https://images.unsplash.com/photo-1448375240586-882707db888b?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&h=150&q=80",
+      "author": "Dravin",
+      "downloadLinks": [
+        {
+          "name": "MediaFire",
+          "url": "https://www.mediafire.com/file/abtd5iumz2jdrp3/Map_by_dravin_jangan_di_colong%2521%2521.zip/file"
+        }
+      ]
+    },
+    {
+      "name": "City Metropolis",
+      "thumbnail": "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?ixlib=rb-1.2.1&auto=format&fit=crop&w=300&h=150&q=80",
+      "author": "Dravin",
+      "downloadLinks": [
+        {
+          "name": "MediaFire",
+          "url": "https://www.mediafire.com/file/rstm09hqpwqixeu/map_by_dravin.zip/file"
+        }
+      ]
+    }
+  ]
+}
