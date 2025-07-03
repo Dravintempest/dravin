@@ -783,8 +783,7 @@
                 <input type="text" id="searchInputHome" placeholder="Search song or artist...">
             </div>
             <div id="allSongsListHome" class="music-list-container">
-                <!-- Songs will be loaded here -->
-            </div>
+                </div>
         </div>
 
         <div id="playlistContent" class="content-section">
@@ -795,8 +794,7 @@
                 </button>
             </div>
             <div id="playlistsGrid" class="playlist-grid">
-                <!-- Playlists will be loaded here -->
-            </div>
+                </div>
             <div id="emptyPlaylistsState" class="empty-state" style="display: none;">
                 <i class="fas fa-compact-disc" style="font-size: 3rem; margin-bottom: 15px;"></i>
                 <h3>You don't have any playlists yet</h3>
@@ -843,12 +841,10 @@
                         </div>
                     </div>
                     
-                    <!-- Add Song Button (for logged in users) -->
                     <button class="btn" id="addSongBtn" style="margin-top: 20px; width: 100%;">
                         <i class="fas fa-plus"></i> Add Song
                     </button>
                     
-                    <!-- Request Song Button -->
                     <button class="btn btn-outline" id="requestSongBtn" style="margin-top: 10px; width: 100%;">
                         <i class="fas fa-paper-plane"></i> Request Song
                     </button>
@@ -918,7 +914,6 @@
         </a>
     </div>
 
-    <!-- Add Song Modal -->
     <div class="modal" id="addSongModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -953,7 +948,6 @@
         </div>
     </div>
 
-    <!-- Request Song Modal -->
     <div class="modal" id="requestSongModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -1087,6 +1081,7 @@
             currentActiveTab = localStorage.getItem('currentActiveTab') || 'home';
             showTab(currentActiveTab); 
             
+            // Call this AFTER loading songs and setting initial volume
             syncPlayerStateFromLocalStorage();
             updateProfileUI();
 
@@ -1096,6 +1091,7 @@
         // --- Data Loading ---
         async function loadSongsFromJSON() {
             try {
+                // Add a cache-busting parameter to ensure the latest file is fetched
                 const response = await fetch('songs.json?v=' + new Date().getTime());
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -1150,6 +1146,7 @@
             filteredSongs.forEach(song => {
                 const musicItem = document.createElement('div');
                 musicItem.classList.add('music-item');
+                // Ensure correct active state when rendered
                 if (song.id === currentPlayingSongId) {
                     musicItem.classList.add('active-play');
                 }
@@ -1173,8 +1170,8 @@
                 playlistsGrid.style.display = 'none';
                 return;
             } else {
-                emptyPlaylistsState.style.display = 'none';
-                playlistsGrid.style.display = 'grid';
+                emptyPlaylistsState.style.display = 'grid'; // Use 'grid' if you want it to behave like a grid, otherwise 'block'
+                playlistsGrid.style.display = 'grid'; // Ensure grid is displayed
             }
 
             userPlaylists.forEach(playlist => {
@@ -1198,30 +1195,29 @@
             if (currentPlayingSongId) {
                 const songToLoad = findSongById(currentPlayingSongId);
                 if (songToLoad) {
-                    loadSong(songToLoad);
+                    loadSong(songToLoad); // Loads song details and sets audio.src
                     audioPlayer.currentTime = lastKnownTime;
+                    
+                    // Crucial: Do NOT call audioPlayer.play() here.
+                    // Just set the UI to reflect the last known state.
                     if (isPlaying) {
-                        audioPlayer.play().catch(e => {
-                            console.warn("Autoplay prevented:", e);
-                            isPlaying = false;
-                            playPauseIcon.classList.replace('fa-pause', 'fa-play');
-                        });
                         playPauseIcon.classList.replace('fa-play', 'fa-pause');
                     } else {
                         playPauseIcon.classList.replace('fa-pause', 'fa-play');
                     }
+                    miniPlayer.style.display = 'flex'; // Ensure mini-player is always visible if a song is known
                     loopBtn.classList.toggle('active', isLooping);
                 } else {
+                    // Song not found (maybe removed from songs.json), reset player
                     resetPlayerState();
                 }
             } else {
                 miniPlayer.style.display = 'none';
             }
-            renderAllSongs();
-            if (currentViewingPlaylistId) {
-                 renderCurrentPlaylistSongsInModal(currentViewingPlaylistId);
-            }
-            renderUserPlaylists();
+            renderAllSongs(); // Update active state on visible songs
+            // If you have a playlist modal that shows songs, you'd call its render here too.
+            // renderCurrentPlaylistSongsInModal(currentViewingPlaylistId); // Assuming such a function exists
+            renderUserPlaylists(); // Ensure playlists are updated
         }
 
         function findSongById(id) {
@@ -1229,17 +1225,25 @@
         }
 
         function loadSong(song) {
+            if (!song) {
+                console.error("Attempted to load a null/undefined song.");
+                resetPlayerState();
+                return;
+            }
+
             miniPlayerImg.src = song.thumbnail;
             miniPlayerTitle.textContent = song.title;
             miniPlayerArtist.textContent = song.artist;
             audioPlayer.src = song.mp3;
+            audioPlayer.load(); // Tell the audio element to load the new source
             currentPlayingSongId = song.id;
 
-            miniPlayer.style.display = 'flex';
+            miniPlayer.style.display = 'flex'; // Ensure mini-player is visible
 
             localStorage.setItem('currentPlayingSongId', currentPlayingSongId);
-            localStorage.setItem('lastKnownTime', 0);
+            localStorage.setItem('lastKnownTime', 0); // Reset time when loading new song
 
+            // Update active class for all visible song items
             document.querySelectorAll('.music-item').forEach(item => {
                 if (item.getAttribute('data-id') === song.id) {
                     item.classList.add('active-play');
@@ -1254,6 +1258,7 @@
         function playCurrentSong() {
             if (!audioPlayer.src) {
                 let songToPlay = null;
+                // Attempt to load a default song if nothing is in the player
                 if (currentActiveTab === 'playlist' && userPlaylists.length > 0) {
                     const targetPlaylist = userPlaylists.find(p => p.id === currentViewingPlaylistId) || userPlaylists[0];
                     if (targetPlaylist && targetPlaylist.songs.length > 0) {
@@ -1270,18 +1275,34 @@
                     return;
                 }
             }
-            audioPlayer.play().catch(e => {
-                console.error("Error playing audio:", e);
-                if (e.name === 'NotAllowedError') {
-                    alert("Playback blocked by browser. Please tap play button to start music.");
-                }
-            });
-            isPlaying = true;
-            playPauseIcon.classList.replace('fa-play', 'fa-pause');
-            localStorage.setItem('isPlaying', 'true');
-            if (currentPlayingSongId) {
-                showMediaNotification(findSongById(currentPlayingSongId));
-            }
+
+            // Attempt to play the audio
+            audioPlayer.play()
+                .then(() => {
+                    isPlaying = true;
+                    playPauseIcon.classList.replace('fa-play', 'fa-pause');
+                    localStorage.setItem('isPlaying', 'true');
+                    if (currentPlayingSongId) {
+                        showMediaNotification(findSongById(currentPlayingSongId));
+                    }
+                })
+                .catch(e => {
+                    console.error("Error playing audio:", e);
+                    isPlaying = false; // Ensure UI reflects not playing
+                    playPauseIcon.classList.replace('fa-pause', 'fa-play'); // Update icon
+                    localStorage.setItem('isPlaying', 'false');
+                    if (e.name === 'NotAllowedError') {
+                        // This happens if the browser blocks autoplay. Inform the user.
+                        alert("Playback blocked by browser. Please tap the play button again to start.");
+                    } else if (e.name === 'AbortError') {
+                        // This can happen if play() is called before the previous one finished,
+                        // or if the audio element is not ready. Often harmless.
+                        console.warn("Audio playback aborted (often normal if changing songs quickly).");
+                    } else {
+                        // Other unexpected errors
+                        alert(`An unexpected audio error occurred: ${e.message}`);
+                    }
+                });
         }
 
         function pauseCurrentSong() {
@@ -1300,11 +1321,20 @@
         }
 
         function getSongContext() {
-            if (currentViewingPlaylistId && viewPlaylistSongsModal.style.display === 'flex') {
+            // This needs a modal for playlist songs to properly function with context
+            // If no specific playlist is being viewed (e.g., in a modal), default to all songs
+            // For now, let's assume if currentViewingPlaylistId is set, it means we're in a modal
+            // where playlist context matters. You'll need to define how 'viewPlaylistSongsModal' is triggered.
+            // If you don't have a playlist viewing modal, this logic needs adjustment.
+            // For simplicity, let's just use allSongs for now or the current playlist if one is open.
+            
+            if (currentViewingPlaylistId) { // Placeholder for when a playlist is open in a modal
                 const playlist = userPlaylists.find(p => p.id === currentViewingPlaylistId);
-                return playlist ? playlist.songs : allSongs;
+                if (playlist && playlist.songs.length > 0) {
+                    return playlist.songs;
+                }
             }
-            return allSongs;
+            return allSongs; // Default context is all songs
         }
 
         function getNextSong(currentSongId, contextArray, loopEnabled) {
@@ -1314,9 +1344,9 @@
             if (currentIndex < contextArray.length - 1) {
                 return contextArray[currentIndex + 1];
             } else if (loopEnabled) {
-                return contextArray[0];
+                return contextArray[0]; // Loop back to first song
             }
-            return null;
+            return null; // No next song and not looping
         }
 
         function getPrevSong(currentSongId, contextArray, loopEnabled) {
@@ -1326,9 +1356,9 @@
             if (currentIndex > 0) {
                 return contextArray[currentIndex - 1];
             } else if (loopEnabled) {
-                return contextArray[contextArray.length - 1];
+                return contextArray[contextArray.length - 1]; // Loop to last song
             }
-            return null;
+            return null; // No previous song and not looping
         }
         
         function playNextSong() {
@@ -1339,7 +1369,7 @@
                 loadSong(nextSongObj);
                 playCurrentSong();
             } else {
-                resetPlayerState();
+                resetPlayerState(); // Stop playback if no next song
             }
         }
 
@@ -1351,7 +1381,7 @@
                 loadSong(prevSongObj);
                 playCurrentSong();
             } else {
-                resetPlayerState();
+                resetPlayerState(); // Stop playback if no previous song
             }
         }
 
@@ -1361,17 +1391,15 @@
             progress.style.width = `${progressPercent}%`;
 
             const formatTime = (time) => {
+                if (isNaN(time) || !isFinite(time)) return '0:00'; // Handle NaN or Infinity
                 const minutes = Math.floor(time / 60);
                 const seconds = Math.floor(time % 60);
                 return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
             };
 
             currentTimeDisplay.textContent = formatTime(currentTime);
-            if (duration && !isNaN(duration)) {
-                durationDisplay.textContent = formatTime(duration);
-            } else {
-                durationDisplay.textContent = '0:00';
-            }
+            durationDisplay.textContent = formatTime(duration); // Always update duration
+            
             localStorage.setItem('lastKnownTime', currentTime);
         }
 
@@ -1397,18 +1425,19 @@
 
         function resetPlayerState() {
             audioPlayer.pause();
-            audioPlayer.src = '';
+            audioPlayer.src = ''; // Clear the audio source
             isPlaying = false;
             playPauseIcon.classList.replace('fa-pause', 'fa-play');
             currentPlayingSongId = null;
-            miniPlayer.style.display = 'none';
+            miniPlayer.style.display = 'none'; // Hide mini player
             localStorage.removeItem('currentPlayingSongId');
             localStorage.removeItem('isPlaying');
             localStorage.removeItem('lastKnownTime');
-            renderAllSongs();
-            if (currentViewingPlaylistId) {
-                renderCurrentPlaylistSongsInModal(currentViewingPlaylistId);
-            }
+            renderAllSongs(); // Re-render to remove active class
+            // If you have a playlist modal, ensure its state is updated too
+            // if (currentViewingPlaylistId) {
+            //      renderCurrentPlaylistSongsInModal(currentViewingPlaylistId);
+            // }
         }
 
         // --- Profile & Google Login ---
@@ -1425,14 +1454,19 @@
         }
 
         function logout() {
-            if (gapi.client) {
-                google.accounts.id.disableAutoSelect();
+            // Check if google accounts library is loaded and gapi.client exists
+            if (typeof google !== 'undefined' && google.accounts && google.accounts.id) {
+                google.accounts.id.disableAutoSelect(); // Disables automatic sign-in attempts
+                console.log("Google auto-select disabled.");
+            } else {
+                console.warn("Google Accounts ID library not fully loaded for logout.");
             }
+            
             userProfile = null;
             localStorage.removeItem('userProfile');
             updateProfileUI();
             alert("You have been logged out.");
-            showTab('profile');
+            showTab('profile'); // Return to the profile tab, showing logged out state
         }
 
         function updateProfileUI() {
@@ -1468,7 +1502,10 @@
                 const playedSong = findSongById(currentPlayingSongId);
                 if (playedSong) {
                     listeningStats.songsListened++;
-                    const [minutes, seconds] = playedSong.duration.split(':').map(Number);
+                    // Safely parse duration. Assuming "MM:SS" format.
+                    const durationParts = playedSong.duration.split(':').map(Number);
+                    const minutes = durationParts[0] || 0;
+                    const seconds = durationParts[1] || 0;
                     listeningStats.totalListeningTime += (minutes * 60) + seconds;
                     localStorage.setItem('listeningStats', JSON.stringify(listeningStats));
                     updateListeningStatsUI();
@@ -1492,25 +1529,26 @@
         }
 
         function showMediaNotification(song) {
+            // Only show notification if permission is granted AND currently playing
             if ('Notification' in window && Notification.permission === 'granted' && isPlaying) {
                 if (currentNotification) {
-                    currentNotification.close();
+                    currentNotification.close(); // Close previous notification if exists
                 }
 
                 const options = {
                     body: song.artist,
-                    icon: song.thumbnail,
-                    image: song.thumbnail,
-                    tag: 'dravin-music-player',
-                    renotify: true,
-                    silent: true,
+                    icon: song.thumbnail, // Use thumbnail for icon
+                    image: song.thumbnail, // Use thumbnail for larger image (some platforms support this)
+                    tag: 'dravin-music-player', // Group notifications
+                    renotify: true, // Allow new notifications to buzz/ring
+                    silent: true, // Do not play a sound with the notification itself
                     data: { url: window.location.href }
                 };
 
                 currentNotification = new Notification(song.title, options);
                 currentNotification.onclick = function() {
-                    window.focus();
-                    this.close();
+                    window.focus(); // Bring browser window to foreground
+                    this.close(); // Close notification after click
                 };
             }
         }
@@ -1520,8 +1558,9 @@
                 navigator.mediaSession.metadata = new MediaMetadata({
                     title: song.title,
                     artist: song.artist,
-                    album: 'Dravin Music',
+                    album: 'Dravin Music', // You can set a default album name
                     artwork: [
+                        // Provide multiple sizes for better compatibility across devices
                         { src: song.thumbnail, sizes: '96x96', type: 'image/jpeg' },
                         { src: song.thumbnail, sizes: '128x128', type: 'image/jpeg' },
                         { src: song.thumbnail, sizes: '192x192', type: 'image/jpeg' },
@@ -1531,10 +1570,15 @@
                     ]
                 });
 
+                // Set up action handlers for media keys (play, pause, next, previous)
                 navigator.mediaSession.setActionHandler('play', () => playCurrentSong());
                 navigator.mediaSession.setActionHandler('pause', () => pauseCurrentSong());
                 navigator.mediaSession.setActionHandler('previoustrack', () => playPrevSong());
                 navigator.mediaSession.setActionHandler('nexttrack', () => playNextSong());
+                
+                // Optional: Add seek action handlers if you implement seeking
+                // navigator.mediaSession.setActionHandler('seekbackward', (event) => { /* ... */ });
+                // navigator.mediaSession.setActionHandler('seekforward', (event) => { /* ... */ });
             }
         }
 
@@ -1550,16 +1594,36 @@
                 document.body.classList.add('dark-mode');
                 themeToggleCheckbox.checked = true;
             } else {
+                document.body.classList.remove('dark-mode'); // Ensure light mode is default if not set
                 themeToggleCheckbox.checked = false;
+            }
+        }
+
+        // --- Modal & Playlist Management (Simplified from original due to scope) ---
+        // For 'New Playlist' button click handler (modal not defined in HTML)
+        function openCreatePlaylistModal() {
+            // In a real app, you'd show a modal for creating a new playlist here
+            // For now, let's add a dummy playlist for demonstration
+            const newPlaylistId = 'playlist_' + Date.now();
+            const newPlaylistName = prompt("Enter new playlist name:");
+            if (newPlaylistName) {
+                userPlaylists.push({
+                    id: newPlaylistId,
+                    name: newPlaylistName,
+                    image: 'https://via.placeholder.com/100/ADD8E6/000000?text=' + encodeURIComponent(newPlaylistName.substring(0,1).toUpperCase()),
+                    songs: [] // Initially empty
+                });
+                localStorage.setItem('userPlaylists', JSON.stringify(userPlaylists));
+                renderUserPlaylists();
             }
         }
 
         // --- Event Listeners ---
         function setupEventListeners() {
             // Bottom Navigation
-            homeTab.addEventListener('click', () => showTab('home'));
-            playlistTab.addEventListener('click', () => showTab('playlist'));
-            profileTab.addEventListener('click', () => showTab('profile'));
+            homeTab.addEventListener('click', (e) => { e.preventDefault(); showTab('home'); });
+            playlistTab.addEventListener('click', (e) => { e.preventDefault(); showTab('playlist'); });
+            profileTab.addEventListener('click', (e) => { e.preventDefault(); showTab('profile'); });
 
             // Home Section
             searchInputHome.addEventListener('input', renderAllSongs);
@@ -1570,7 +1634,7 @@
                     const songToPlay = allSongs.find(song => song.id === songId);
                     if (songToPlay) {
                         loadSong(songToPlay);
-                        playCurrentSong();
+                        playCurrentSong(); // Explicitly call play
                     }
                 }
             });
@@ -1596,6 +1660,29 @@
             // Playlist Section
             createNewPlaylistBtn.addEventListener('click', openCreatePlaylistModal);
             createFirstPlaylistBtn.addEventListener('click', openCreatePlaylistModal);
+            
+            playlistsGrid.addEventListener('click', (e) => {
+                const deleteBtn = e.target.closest('.delete-playlist-btn');
+                const playlistCard = e.target.closest('.playlist-card');
+
+                if (deleteBtn) {
+                    e.stopPropagation(); // Prevent card click event
+                    const playlistIdToDelete = deleteBtn.getAttribute('data-playlist-id');
+                    if (confirm("Are you sure you want to delete this playlist?")) {
+                        userPlaylists = userPlaylists.filter(p => p.id !== playlistIdToDelete);
+                        localStorage.setItem('userPlaylists', JSON.stringify(userPlaylists));
+                        renderUserPlaylists();
+                        alert("Playlist deleted.");
+                    }
+                } else if (playlistCard) {
+                    const playlistId = playlistCard.getAttribute('data-playlist-id');
+                    // In a real app, you'd open a modal here to view/edit playlist songs
+                    alert(`Opening playlist: ${userPlaylists.find(p => p.id === playlistId)?.name || 'Unknown Playlist'}`);
+                    // Example: Implement a function to open a playlist details modal
+                    // openPlaylistDetailsModal(playlistId);
+                }
+            });
+
 
             // Profile Section
             themeToggleCheckbox.addEventListener('change', toggleTheme);
@@ -1625,6 +1712,9 @@
                     return;
                 }
                 
+                // In a real application, you would send this data to a backend server
+                // for approval and to be added to your 'songs.json' (or database).
+                console.log("New song submission:", { title, artist, mp3, thumbnail, releaseDate });
                 alert('Song submitted for admin approval. Thank you!');
                 addSongForm.reset();
                 addSongModal.style.display = 'none';
@@ -1647,6 +1737,8 @@
                     return;
                 }
                 
+                // In a real application, you would send this data to a backend server
+                console.log("Song request submission:", { title, artist, description, requestedBy });
                 alert('Song request submitted. Thank you!');
                 requestSongForm.reset();
                 requestSongModal.style.display = 'none';
@@ -1659,7 +1751,7 @@
             });
         }
 
-        // Initialize the application
+        // Initialize the application when the DOM is fully loaded
         document.addEventListener('DOMContentLoaded', initApp);
     </script>
 </body>
