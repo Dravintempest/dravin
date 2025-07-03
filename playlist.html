@@ -92,7 +92,22 @@
             align-items: center;
             padding: 10px;
             border-bottom: 1px solid var(--control-bg);
+            cursor: pointer; /* Make the whole item clickable for playing */
         }
+
+        .song-item:hover {
+            background-color: var(--control-bg);
+        }
+
+        .song-item.active-play { /* New class for currently playing song in playlist */
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .song-item.active-play .song-artist {
+            color: #ddd; /* Adjust color for active song in dark mode if needed */
+        }
+
 
         .song-info {
             display: flex;
@@ -124,6 +139,8 @@
         .song-actions {
             display: flex;
             gap: 10px;
+            /* Ensure these buttons don't trigger the song-item's play logic */
+            pointer-events: all; 
         }
 
         .action-btn {
@@ -132,6 +149,7 @@
             color: var(--text-color);
             cursor: pointer;
             font-size: 1rem;
+            padding: 5px; /* Add padding for easier click */
         }
 
         .action-btn:hover {
@@ -213,20 +231,19 @@
             padding: 10px;
             border-radius: 5px;
             margin-bottom: 5px;
-            cursor: pointer;
         }
 
         .select-song-item:hover {
             background-color: var(--control-bg);
         }
 
-        .select-song-item.active {
-            background-color: var(--primary-color);
-            color: white;
+        .select-song-item.in-playlist { /* Changed class name for clarity */
+            background-color: var(--control-bg); /* Subtle indicator */
+            opacity: 0.7;
         }
-
-        .select-song-item.active .song-artist {
-            color: #ddd;
+        .select-song-item.in-playlist .add-song-btn {
+             opacity: 0.5;
+             cursor: not-allowed;
         }
 
         /* Now Playing Section */
@@ -387,7 +404,7 @@
         // State
         let allSongs = [];
         let playlist = JSON.parse(localStorage.getItem('playlist')) || [];
-        let currentPlayingIndex = -1;
+        let currentPlayingIndex = -1; // Index within the 'playlist' array
         let isPlaying = false;
 
         // Initialize
@@ -397,26 +414,32 @@
             checkTheme();
             setupEventListeners();
             
-            // Show now playing if there's a song in playlist
-            if (playlist.length > 0) {
+            // Try to load last playing song from localStorage
+            const lastPlayingIndex = parseInt(localStorage.getItem('lastPlayingIndex'));
+            if (!isNaN(lastPlayingIndex) && lastPlayingIndex >= 0 && lastPlayingIndex < playlist.length) {
+                currentPlayingIndex = lastPlayingIndex;
+                updateNowPlaying();
+            } else if (playlist.length > 0) {
+                // If no last playing song, but playlist has songs, display the first one
+                currentPlayingIndex = 0;
                 updateNowPlaying();
             }
         }
 
-        // Load all available songs
+        // Load all available songs from songs.json
         async function loadAllSongs() {
             try {
-                const response = await fetch('songs.json');
-                if (!response.ok) throw new Error('Failed to load songs');
+                const response = await fetch('songs.json?v=' + new Date().getTime()); // Add cache-busting
+                if (!response.ok) throw new Error('Failed to load songs from songs.json');
                 allSongs = await response.json();
                 renderSongSelection(); // Render songs after loading
             } catch (error) {
                 console.error('Error loading songs:', error);
-                allSongsList.innerHTML = '<p>Failed to load songs</p>';
+                allSongsList.innerHTML = '<p style="text-align: center; color: var(--text-color);">Failed to load songs. Please try again later.</p>';
             }
         }
 
-        // Render playlist
+        // Render songs in the user's playlist
         function renderPlaylist() {
             if (playlist.length === 0) {
                 playlistSongs.innerHTML = `
@@ -429,19 +452,20 @@
                         </button>
                     </div>
                 `;
-                
                 document.getElementById('addFirstSongBtn')?.addEventListener('click', () => {
                     songModal.style.display = 'flex';
-                    renderSongSelection();
+                    renderSongSelection(); // Ensure selection is fresh
                 });
-                
+                nowPlaying.style.display = 'none'; // Hide now playing if playlist is empty
                 return;
             }
 
             playlistSongs.innerHTML = '';
             playlist.forEach((song, index) => {
                 const songItem = document.createElement('div');
-                songItem.className = 'song-item';
+                // Use song ID for data attribute for robust removal
+                songItem.className = `song-item ${index === currentPlayingIndex ? 'active-play' : ''}`;
+                songItem.setAttribute('data-index', index); // Add data-index for direct play
                 songItem.innerHTML = `
                     <div class="song-info">
                         <img src="${song.thumbnail}" class="song-img" alt="${song.title}">
@@ -451,33 +475,44 @@
                         </div>
                     </div>
                     <div class="song-actions">
-                        <button class="action-btn play-song-btn" data-index="${index}" title="Play">
-                            <i class="fas fa-play"></i>
-                        </button>
-                        <button class="action-btn remove-song-btn" data-index="${index}" title="Remove">
+                        <button class="action-btn remove-song-btn" data-id="${song.id}" title="Remove">
                             <i class="fas fa-trash"></i>
                         </button>
                     </div>
                 `;
                 playlistSongs.appendChild(songItem);
             });
+            // Ensure now playing section is visible if playlist has songs
+            if (playlist.length > 0) {
+                nowPlaying.style.display = 'flex';
+            }
         }
 
-        // Render song selection in modal
+        // Render song selection in the modal (all available songs)
         function renderSongSelection() {
             allSongsList.innerHTML = '';
             
             if (allSongs.length === 0) {
-                allSongsList.innerHTML = '<p>No songs available</p>';
+                allSongsList.innerHTML = '<p style="text-align: center; color: var(--text-color);">No songs available to add.</p>';
                 return;
             }
 
-            allSongs.forEach(song => {
-                // Check if song is already in playlist
+            const searchTerm = searchSong.value.toLowerCase();
+            const filteredSongs = allSongs.filter(song =>
+                song.title.toLowerCase().includes(searchTerm) ||
+                song.artist.toLowerCase().includes(searchTerm)
+            );
+
+            if (filteredSongs.length === 0) {
+                allSongsList.innerHTML = '<p style="text-align: center; color: var(--text-color);">No matching songs found.</p>';
+                return;
+            }
+
+            filteredSongs.forEach(song => {
                 const isInPlaylist = playlist.some(s => s.id === song.id);
                 
                 const songItem = document.createElement('div');
-                songItem.className = `select-song-item ${isInPlaylist ? 'active' : ''}`;
+                songItem.className = `select-song-item ${isInPlaylist ? 'in-playlist' : ''}`;
                 songItem.innerHTML = `
                     <img src="${song.thumbnail}" class="song-img" alt="${song.title}">
                     <div class="song-details">
@@ -493,7 +528,7 @@
             });
         }
 
-        // Update now playing section
+        // Update now playing section with current song details
         function updateNowPlaying() {
             if (currentPlayingIndex >= 0 && currentPlayingIndex < playlist.length) {
                 const song = playlist[currentPlayingIndex];
@@ -502,13 +537,31 @@
                 nowPlayingArtist.textContent = song.artist;
                 audioPlayer.src = song.mp3;
                 nowPlaying.style.display = 'flex';
+                // Save current playing index to localStorage
+                localStorage.setItem('lastPlayingIndex', currentPlayingIndex);
+
+                // Update active class in playlist display
+                document.querySelectorAll('.song-item').forEach((item, idx) => {
+                    if (idx === currentPlayingIndex) {
+                        item.classList.add('active-play');
+                    } else {
+                        item.classList.remove('active-play');
+                    }
+                });
+
             } else {
                 nowPlaying.style.display = 'none';
+                localStorage.removeItem('lastPlayingIndex');
             }
         }
 
-        // Play song from playlist
+        // Play song from playlist by index
         function playSong(index) {
+            if (index === currentPlayingIndex && isPlaying) {
+                togglePlayPause(); // If already playing this song, just toggle
+                return;
+            }
+
             if (index >= 0 && index < playlist.length) {
                 currentPlayingIndex = index;
                 updateNowPlaying();
@@ -518,9 +571,14 @@
             }
         }
 
-        // Toggle play/pause
+        // Toggle play/pause for the current song in the now playing section
         function togglePlayPause() {
-            if (currentPlayingIndex === -1 && playlist.length > 0) {
+            if (playlist.length === 0) {
+                alert("Your playlist is empty! Add songs first.");
+                return;
+            }
+
+            if (currentPlayingIndex === -1) { // If nothing selected, play the first song
                 playSong(0);
                 return;
             }
@@ -536,73 +594,53 @@
             }
         }
 
-        // Add song to playlist
+        // Add song to playlist and update UI
         function addToPlaylist(songId) {
-            const songToAdd = allSongs.find(song => song.id === songId);
+            const songToAdd = allSongs.find(song => song.id == songId); // Use == for flexible comparison
             if (songToAdd && !playlist.some(song => song.id === songId)) {
                 playlist.push(songToAdd);
                 localStorage.setItem('playlist', JSON.stringify(playlist));
-                renderPlaylist();
-                renderSongSelection(); // Re-render modal to update add buttons
+                renderPlaylist(); // Re-render playlist to show new song
+                renderSongSelection(); // Re-render modal to disable 'Add' button for added song
                 
-                // If this is the first song added, play it
+                // If this is the first song added, update now playing
                 if (playlist.length === 1) {
-                    playSong(0);
+                    currentPlayingIndex = 0;
+                    updateNowPlaying();
                 }
             }
         }
 
-        // Remove song from playlist
-        function removeFromPlaylist(index) {
-            if (index >= 0 && index < playlist.length) {
-                // If we're removing the currently playing song, stop playback
-                if (index === currentPlayingIndex) {
+        // Remove song from playlist and update UI
+        function removeFromPlaylist(songIdToRemove) {
+            const indexToRemove = playlist.findIndex(song => song.id == songIdToRemove);
+
+            if (indexToRemove !== -1) {
+                // If removing the currently playing song
+                if (indexToRemove === currentPlayingIndex) {
                     audioPlayer.pause();
-                    currentPlayingIndex = -1;
                     isPlaying = false;
-                    nowPlaying.style.display = 'none';
+                    playIcon.classList.replace('fa-pause', 'fa-play');
+                    currentPlayingIndex = -1; // Reset playing index
+                    nowPlaying.style.display = 'none'; // Hide now playing section
                 }
                 
-                playlist.splice(index, 1);
+                playlist.splice(indexToRemove, 1);
                 localStorage.setItem('playlist', JSON.stringify(playlist));
-                renderPlaylist();
-                renderSongSelection(); // Re-render modal to update add buttons
+
+                // Adjust currentPlayingIndex if songs before it were removed
+                if (indexToRemove < currentPlayingIndex) {
+                    currentPlayingIndex--;
+                }
+                
+                renderPlaylist(); // Re-render playlist to reflect removal
+                renderSongSelection(); // Re-render modal to enable 'Add' button for removed song
             }
         }
 
-        // Search songs
+        // Search songs in the modal
         function searchSongs() {
-            const term = searchSong.value.toLowerCase();
-            const filtered = allSongs.filter(song => 
-                song.title.toLowerCase().includes(term) || 
-                song.artist.toLowerCase().includes(term)
-            );
-            
-            allSongsList.innerHTML = '';
-            
-            if (filtered.length === 0) {
-                allSongsList.innerHTML = '<p>No songs found</p>';
-                return;
-            }
-
-            filtered.forEach(song => {
-                const isInPlaylist = playlist.some(s => s.id === song.id);
-                
-                const songItem = document.createElement('div');
-                songItem.className = `select-song-item ${isInPlaylist ? 'active' : ''}`;
-                songItem.innerHTML = `
-                    <img src="${song.thumbnail}" class="song-img" alt="${song.title}">
-                    <div class="song-details">
-                        <div class="song-title">${song.title}</div>
-                        <div class="song-artist">${song.artist}</div>
-                    </div>
-                    <div class="song-duration">${song.duration}</div>
-                    <button class="btn add-song-btn" data-id="${song.id}" ${isInPlaylist ? 'disabled' : ''}>
-                        <i class="fas fa-plus"></i> Add
-                    </button>
-                `;
-                allSongsList.appendChild(songItem);
-            });
+            renderSongSelection(); // Simply re-render the modal content based on current search input
         }
 
         // Toggle theme
@@ -612,14 +650,14 @@
             updateThemeIcon();
         }
 
-        // Check saved theme
+        // Check saved theme preference on page load
         function checkTheme() {
             const darkMode = localStorage.getItem('darkMode') === 'true';
             if (darkMode) document.body.classList.add('dark-mode');
             updateThemeIcon();
         }
 
-        // Update theme icon
+        // Update theme button icon and text
         function updateThemeIcon() {
             const icon = themeToggle.querySelector('i');
             if (document.body.classList.contains('dark-mode')) {
@@ -631,72 +669,78 @@
             }
         }
 
-        // Setup event listeners
+        // Setup all event listeners
         function setupEventListeners() {
-            // Navigation
+            // Navigation buttons
             backBtn.addEventListener('click', () => window.location.href = 'index.html');
             requestBtn.addEventListener('click', () => window.location.href = 'request.html');
+            
+            // Add Song Modal
             addSongBtn.addEventListener('click', () => {
                 songModal.style.display = 'flex';
-                renderSongSelection();
+                searchSong.value = ''; // Clear search when opening modal
+                renderSongSelection(); // Ensure modal list is fresh
             });
             closeModal.addEventListener('click', () => songModal.style.display = 'none');
+            window.addEventListener('click', (e) => { // Close modal by clicking outside
+                if (e.target === songModal) songModal.style.display = 'none';
+            });
             
             // Theme toggle
             themeToggle.addEventListener('click', toggleTheme);
             
-            // Search
+            // Search in modal
             searchSong.addEventListener('input', searchSongs);
             
-            // Playlist actions
+            // Delegated event listeners for dynamically created elements
+            // Play song from playlist (clicking on the song item itself)
             playlistSongs.addEventListener('click', (e) => {
-                // Play song
-                if (e.target.closest('.play-song-btn')) {
-                    const btn = e.target.closest('.play-song-btn');
-                    const index = parseInt(btn.getAttribute('data-index'));
+                const songItem = e.target.closest('.song-item');
+                if (songItem && !e.target.closest('.action-btn')) { // Ensure click wasn't on an action button
+                    const index = parseInt(songItem.getAttribute('data-index'));
                     playSong(index);
                 }
-                
-                // Remove song
-                if (e.target.closest('.remove-song-btn')) {
-                    const btn = e.target.closest('.remove-song-btn');
-                    const index = parseInt(btn.getAttribute('data-index'));
-                    removeFromPlaylist(index);
+            });
+
+            // Remove song from playlist
+            playlistSongs.addEventListener('click', (e) => {
+                const removeBtn = e.target.closest('.remove-song-btn');
+                if (removeBtn) {
+                    const songId = removeBtn.getAttribute('data-id');
+                    removeFromPlaylist(songId);
                 }
             });
             
-            // Add song to playlist
+            // Add song to playlist from modal
             allSongsList.addEventListener('click', (e) => {
-                if (e.target.closest('.add-song-btn')) {
-                    const btn = e.target.closest('.add-song-btn');
-                    if (!btn.disabled) {
-                        const songId = btn.getAttribute('data-id');
-                        addToPlaylist(songId);
-                    }
+                const addBtn = e.target.closest('.add-song-btn');
+                if (addBtn && !addBtn.disabled) {
+                    const songId = addBtn.getAttribute('data-id');
+                    addToPlaylist(songId);
                 }
             });
             
-            // Play/pause button
+            // Global play/pause button in now playing section
             playBtn.addEventListener('click', togglePlayPause);
             
-            // Handle song ending
+            // Handle song ending in the audio player
             audioPlayer.addEventListener('ended', () => {
                 if (currentPlayingIndex < playlist.length - 1) {
-                    playSong(currentPlayingIndex + 1);
+                    playSong(currentPlayingIndex + 1); // Play next song
                 } else {
+                    // End of playlist
                     isPlaying = false;
                     playIcon.classList.replace('fa-pause', 'fa-play');
+                    currentPlayingIndex = -1; // Reset index
+                    nowPlaying.style.display = 'none'; // Hide now playing section
+                    localStorage.removeItem('lastPlayingIndex');
+                    renderPlaylist(); // Update playlist UI to remove active state
                 }
-            });
-            
-            // Close modal when clicking outside
-            window.addEventListener('click', (e) => {
-                if (e.target === songModal) songModal.style.display = 'none';
             });
         }
 
-        // Initialize the app
-        init();
+        // Initialize the app when the DOM is fully loaded
+        document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
