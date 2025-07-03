@@ -342,23 +342,20 @@
 
         /* New playlist layout */
         .list-header {
-            display: grid;
-            grid-template-columns: 1fr; /* Only for title now */
-            padding: 10px;
-            font-weight: bold;
-            border-bottom: 1px solid #ddd;
-            margin-bottom: 10px;
+            /* Hide the header completely as per request */
+            display: none; 
         }
 
         .music-item {
+            /* Only one column for the title/artist content */
             display: grid;
-            grid-template-columns: 50px 1fr;
+            grid-template-columns: auto; /* Changed from 50px 1fr to auto to fill available space */
             align-items: center;
             padding: 10px;
             border-radius: 8px;
             cursor: pointer;
             margin-bottom: 5px;
-            gap: 8px;
+            gap: 8px; /* Maintain gap between img and text inside music-title */
         }
 
         .music-title-container {
@@ -371,7 +368,7 @@
         .music-title {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 10px; /* Gap between image and title text */
             font-weight: 500;
             white-space: nowrap;
             overflow: hidden;
@@ -382,7 +379,8 @@
             display: flex;
             justify-content: space-between;
             font-size: 0.85rem;
-            padding-left: 40px; /* Match with image width + gap */
+            /* Indent artist/duration to align with title text below image */
+            margin-left: 40px; 
         }
 
         .music-artist {
@@ -398,10 +396,7 @@
             height: 30px;
             border-radius: 5px;
             object-fit: cover;
-        }
-
-        .music-number {
-            text-align: center;
+            flex-shrink: 0; /* Prevent image from shrinking */
         }
 
         .music-item:hover {
@@ -504,10 +499,7 @@
                 <i class="fas fa-search"></i>
                 <input type="text" id="searchInput" placeholder="Cari judul atau artis...">
             </div>
-            <div class="list-header">
-                <div class="header-item" style="display: none;">#</div>
-                <div class="header-item" style="display: none;">Judul</div>
-            </div>
+            <div class="list-header"></div>
             <div id="musicListContainer"></div>
         </div>
     </div>
@@ -610,6 +602,7 @@
                     musicItem.classList.add('active');
                 }
                 
+                // Changed music-number and removed its container from here
                 musicItem.innerHTML = `
                     <div class="music-title-container">
                         <div class="music-title">
@@ -622,7 +615,6 @@
                         </div>
                     </div>
                 `;
-                // Removed music-number as per request
                 
                 musicItem.addEventListener('click', () => {
                     currentSongIndex = index;
