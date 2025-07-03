@@ -173,6 +173,28 @@
         .remove-song-btn:hover {
             color: red;
         }
+        
+        /* New style for add song button in modal */
+        .add-song-to-playlist-btn {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 5px;
+            transition: color 0.2s ease;
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .add-song-to-playlist-btn:hover {
+            color: var(--highlight);
+        }
+        .add-song-to-playlist-btn.added {
+            color: #ccc; /* Grey out if already added */
+            cursor: default;
+        }
 
         .empty-state {
             text-align: center;
@@ -411,7 +433,7 @@
             opacity: 1;
         }
 
-        /* Modal styles are no longer directly used for Add/Request Song, but kept for potential future use or playlist details */
+        /* Modals */
         .modal {
             display: none;
             position: fixed;
@@ -436,6 +458,11 @@
             box-shadow: var(--shadow);
             padding: 25px;
             position: relative;
+            animation: fadeIn 0.3s ease-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .modal-header {
@@ -479,7 +506,42 @@
             margin-top: 10px;
             width: auto;
         }
-
+        
+        /* Playlist Detail Modal Specific Styles */
+        .modal-playlist-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--control-bg);
+        }
+        .modal-playlist-header img {
+            width: 120px;
+            height: 120px;
+            border-radius: 8px;
+            object-fit: cover;
+            box-shadow: var(--shadow);
+        }
+        .modal-playlist-info h3 {
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+        .modal-playlist-info span {
+            font-size: 1rem;
+            color: #777;
+        }
+        .modal-playlist-actions {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+        }
+        .modal-playlist-songs {
+            margin-top: 20px;
+            border-top: 1px solid var(--control-bg);
+            padding-top: 20px;
+        }
         .modal-playlist-songs .music-item {
             padding-right: 40px;
         }
@@ -489,6 +551,12 @@
             top: 50%;
             transform: translateY(-50%);
         }
+
+        /* Add Songs Modal Specific Styles */
+        #addSongsToPlaylistModal .music-item {
+            padding-right: 50px; /* Space for add button */
+        }
+
 
         .btn {
             background-color: var(--primary-color);
@@ -515,6 +583,20 @@
         .btn-outline:hover {
             background-color: var(--primary-color);
             color: white;
+        }
+        .btn-flat {
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            padding: 0;
+            font-size: 0.9rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .btn-flat:hover {
+            text-decoration: underline;
         }
 
         /* Simplified Profile Container */
@@ -883,7 +965,7 @@
                             <span class="slider"></span>
                         </label>
                     </div>
-                    <a href="request" target="_blank" class="btn" id="requestSongBtn" style="margin-top: 20px; width: 100%;">
+                    <a href="https://wa.me/6281234567890?text=Hello%2C%20I%20would%20like%20to%20request%20a%20song!" target="_blank" class="btn" id="requestSongBtn" style="margin-top: 20px; width: 100%;">
                         <i class="fab fa-whatsapp"></i> Request Song via WhatsApp
                     </a>
                 </div>
@@ -892,7 +974,7 @@
     </div>
 
     <div class="mini-player" id="miniPlayer" style="display: none;">
-        <img id="miniPlayerImg" class="mini-player-img" src="" alt="${song.title}">
+        <img id="miniPlayerImg" class="mini-player-img" src="" alt="">
         <div class="mini-player-info">
             <div id="miniPlayerTitle" class="mini-player-title"></div>
             <div id="miniPlayerArtist" class="mini-player-artist"></div>
@@ -944,7 +1026,7 @@
                 <i class="fas fa-times"></i>
             </button>
         </div>
-        <img id="fullScreenAlbumArt" class="full-screen-album-art" src="" alt="${song.title}">
+        <img id="fullScreenAlbumArt" class="full-screen-album-art" src="" alt="">
         <div id="fullScreenSongTitle" class="full-screen-song-title"></div>
         <div id="fullScreenSongArtist" class="full-screen-song-artist"></div>
 
@@ -979,6 +1061,86 @@
     </div>
 
     <audio id="audioPlayer"></audio>
+
+    <div id="playlistFormModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="playlistFormModalTitle">Create New Playlist</h3>
+                <span class="close-modal" data-modal="playlistFormModal">&times;</span>
+            </div>
+            <form id="playlistForm">
+                <label for="playlistNameInput">Playlist Name:</label>
+                <input type="text" id="playlistNameInput" required>
+
+                <label for="playlistImageInput">Image URL (optional):</label>
+                <input type="text" id="playlistImageInput" placeholder="e.g., https://example.com/playlist_cover.jpg">
+                <small style="display: block; margin-bottom: 15px; color: #777;">Paste a direct image URL for the playlist cover.</small>
+                
+                <button type="submit" class="btn">Save Playlist</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="confirmationModal" class="modal">
+        <div class="modal-content" style="max-width: 400px; text-align: center;">
+            <div class="modal-header" style="justify-content: center; border-bottom: none;">
+                <h3 id="confirmationModalTitle">Confirm Action</h3>
+            </div>
+            <p id="confirmationModalMessage" style="margin-bottom: 25px;"></p>
+            <div style="display: flex; justify-content: center; gap: 15px;">
+                <button class="btn btn-outline" id="cancelConfirmBtn">Cancel</button>
+                <button class="btn" id="confirmActionBtn">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="playlistDetailModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header" style="border-bottom: none;">
+                <span class="close-modal" data-modal="playlistDetailModal">&times;</span>
+            </div>
+            <div class="modal-playlist-header">
+                <img id="modalPlaylistImage" src="" alt="Playlist Cover">
+                <div class="modal-playlist-info">
+                    <h3 id="modalPlaylistName"></h3>
+                    <span id="modalPlaylistSongCount"></span>
+                    <div class="modal-playlist-actions">
+                        <button class="btn" id="addSongsToCurrentPlaylistBtn">
+                            <i class="fas fa-plus"></i> Add Songs
+                        </button>
+                        <button class="btn btn-outline" id="playPlaylistBtn">
+                            <i class="fas fa-play"></i> Play All
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-playlist-songs music-list-container" id="modalPlaylistSongsList">
+                <div class="empty-state" id="emptyPlaylistSongsState" style="display: none;">
+                    <i class="fas fa-music" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                    <p>No songs in this playlist yet.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="addSongsToPlaylistModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add Songs to Playlist</h3>
+                <span class="close-modal" data-modal="addSongsToPlaylistModal">&times;</span>
+            </div>
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="addSongsSearchInput" placeholder="Search songs to add...">
+            </div>
+            <div class="music-list-container" id="allSongsForAddingList">
+                </div>
+            <div class="modal-footer" style="margin-top: 20px; text-align: right;">
+                <button class="btn" id="saveAddedSongsBtn">Done</button>
+            </div>
+        </div>
+    </div>
+
 
     <script>
         // --- DOM Elements ---
@@ -1041,6 +1203,34 @@
         const themeToggleCheckbox = document.getElementById('themeToggleCheckbox');
         const requestSongBtn = document.getElementById('requestSongBtn'); 
 
+        // Modals
+        const playlistFormModal = document.getElementById('playlistFormModal');
+        const playlistFormModalTitle = document.getElementById('playlistFormModalTitle');
+        const playlistNameInput = document.getElementById('playlistNameInput');
+        const playlistImageInput = document.getElementById('playlistImageInput');
+        const playlistForm = document.getElementById('playlistForm');
+
+        const confirmationModal = document.getElementById('confirmationModal');
+        const confirmationModalTitle = document.getElementById('confirmationModalTitle');
+        const confirmationModalMessage = document.getElementById('confirmationModalMessage');
+        const cancelConfirmBtn = document.getElementById('cancelConfirmBtn');
+        const confirmActionBtn = document.getElementById('confirmActionBtn');
+        let confirmActionCallback = null;
+
+        const playlistDetailModal = document.getElementById('playlistDetailModal');
+        const modalPlaylistImage = document.getElementById('modalPlaylistImage');
+        const modalPlaylistName = document.getElementById('modalPlaylistName');
+        const modalPlaylistSongCount = document.getElementById('modalPlaylistSongCount');
+        const addSongsToCurrentPlaylistBtn = document.getElementById('addSongsToCurrentPlaylistBtn');
+        const playPlaylistBtn = document.getElementById('playPlaylistBtn');
+        const modalPlaylistSongsList = document.getElementById('modalPlaylistSongsList');
+        const emptyPlaylistSongsState = document.getElementById('emptyPlaylistSongsState');
+
+        const addSongsToPlaylistModal = document.getElementById('addSongsToPlaylistModal');
+        const addSongsSearchInput = document.getElementById('addSongsSearchInput');
+        const allSongsForAddingList = document.getElementById('allSongsForAddingList');
+        const saveAddedSongsBtn = document.getElementById('saveAddedSongsBtn');
+
         // --- State Variables ---
         let allSongs = []; // Will be populated from songs.json
         let userPlaylists = JSON.parse(localStorage.getItem('userPlaylists')) || [];
@@ -1052,7 +1242,9 @@
         let lastKnownVolume = parseFloat(localStorage.getItem('lastKnownVolume')) || 0.7;
 
         let currentActiveTab = 'home';
-        let currentViewingPlaylistId = null; 
+        let currentViewingPlaylistId = null; // ID of the playlist currently open in playlistDetailModal
+        let songsToAddQueue = new Set(); // Stores song IDs to add to playlist
+
 
         // --- Initialization ---
         async function initApp() {
@@ -1080,6 +1272,12 @@
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 allSongs = await response.json();
+                // Assign a unique ID to each song if it doesn't have one (for new songs or if not in JSON)
+                allSongs.forEach(song => {
+                    if (!song.id) {
+                        song.id = 'song_' + Math.random().toString(36).substr(2, 9);
+                    }
+                });
                 if (allSongs.length === 0) {
                     console.warn("songs.json is empty or invalid.");
                     allSongsListHome.innerHTML = '<p class="empty-state">No songs found in library.</p>';
@@ -1159,8 +1357,9 @@
                 const playlistCard = document.createElement('div');
                 playlistCard.classList.add('playlist-card');
                 playlistCard.setAttribute('data-playlist-id', playlist.id);
+                const imageUrl = playlist.image || 'https://via.placeholder.com/100/4a76a8/ffffff?text=' + encodeURIComponent(playlist.name.substring(0,1).toUpperCase());
                 playlistCard.innerHTML = `
-                    <img src="${playlist.image || 'https://via.placeholder.com/100/4a76a8/ffffff?text=Playlist'}" alt="${playlist.name}">
+                    <img src="${imageUrl}" alt="${playlist.name}">
                     <h3>${playlist.name}</h3>
                     <span>${playlist.songs.length} songs</span>
                     <button class="delete-playlist-btn" data-playlist-id="${playlist.id}" title="Delete playlist">
@@ -1171,6 +1370,103 @@
             });
         }
 
+        function renderSongsInPlaylistModal(playlist) {
+            modalPlaylistSongsList.innerHTML = '';
+            if (!playlist || playlist.songs.length === 0) {
+                emptyPlaylistSongsState.style.display = 'block';
+                return;
+            } else {
+                emptyPlaylistSongsState.style.display = 'none';
+            }
+
+            playlist.songs.forEach(songId => {
+                const song = findSongById(songId);
+                if (song) {
+                    const musicItem = document.createElement('div');
+                    musicItem.classList.add('music-item');
+                    if (song.id == currentPlayingSongId) {
+                        musicItem.classList.add('active-play');
+                    }
+                    musicItem.setAttribute('data-id', song.id);
+                    musicItem.innerHTML = `
+                        <img src="${song.thumbnail}" class="music-item-img" alt="${song.title}">
+                        <div class="music-item-info">
+                            <div class="music-item-title">${song.title}</div>
+                            <div class="music-item-artist">${song.artist}</div>
+                        </div>
+                        <span class="music-item-duration">${song.duration}</span>
+                        <button class="remove-song-btn" data-song-id="${song.id}" title="Remove from playlist">
+                            <i class="fas fa-minus-circle"></i>
+                        </button>
+                    `;
+                    modalPlaylistSongsList.appendChild(musicItem);
+                }
+            });
+        }
+
+        function renderAllSongsForAdding(currentPlaylistSongs = []) {
+            const searchTerm = addSongsSearchInput.value.toLowerCase();
+            const currentPlaylistSongIds = new Set(currentPlaylistSongs);
+
+            const filteredSongs = allSongs.filter(song =>
+                (song.title.toLowerCase().includes(searchTerm) ||
+                 song.artist.toLowerCase().includes(searchTerm))
+            );
+
+            allSongsForAddingList.innerHTML = '';
+            if (filteredSongs.length === 0) {
+                allSongsForAddingList.innerHTML = '<p class="empty-state">No matching songs found.</p>';
+                return;
+            }
+
+            filteredSongs.forEach(song => {
+                const musicItem = document.createElement('div');
+                musicItem.classList.add('music-item');
+                musicItem.setAttribute('data-id', song.id);
+
+                const isAlreadyAdded = currentPlaylistSongIds.has(song.id);
+                const isQueued = songsToAddQueue.has(song.id);
+                
+                musicItem.innerHTML = `
+                    <img src="${song.thumbnail}" class="music-item-img" alt="${song.title}">
+                    <div class="music-item-info">
+                        <div class="music-item-title">${song.title}</div>
+                        <div class="music-item-artist">${song.artist}</div>
+                    </div>
+                    <span class="music-item-duration">${song.duration}</span>
+                    <button class="add-song-to-playlist-btn ${isAlreadyAdded || isQueued ? 'added' : ''}" 
+                            data-song-id="${song.id}" 
+                            title="${isAlreadyAdded ? 'Already in playlist' : 'Add to playlist'}"
+                            ${isAlreadyAdded ? 'disabled' : ''}>
+                        <i class="fas ${isQueued ? 'fa-check-circle' : 'fa-plus-circle'}"></i>
+                    </button>
+                `;
+                allSongsForAddingList.appendChild(musicItem);
+
+                if (!isAlreadyAdded) {
+                    const addButton = musicItem.querySelector('.add-song-to-playlist-btn');
+                    addButton.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        const songId = addButton.getAttribute('data-song-id');
+                        toggleSongInAddQueue(songId, addButton);
+                    });
+                }
+            });
+        }
+
+        function toggleSongInAddQueue(songId, buttonElement) {
+            if (songsToAddQueue.has(songId)) {
+                songsToAddQueue.delete(songId);
+                buttonElement.classList.remove('added');
+                buttonElement.querySelector('i').classList.replace('fa-check-circle', 'fa-plus-circle');
+            } else {
+                songsToAddQueue.add(songId);
+                buttonElement.classList.add('added');
+                buttonElement.querySelector('i').classList.replace('fa-plus-circle', 'fa-check-circle');
+            }
+        }
+
+
         // --- Core Music Player Logic ---
         function syncPlayerStateFromLocalStorage() {
             if (currentPlayingSongId) {
@@ -1180,11 +1476,9 @@
                     audioPlayer.currentTime = lastKnownTime;
                     
                     if (isPlaying) {
-                        playPauseIcon.classList.replace('fa-play', 'fa-pause');
-                        fullScreenPlayPauseIcon.classList.replace('fa-play', 'fa-pause');
+                        playCurrentSong(); // Automatically play if it was playing
                     } else {
-                        playPauseIcon.classList.replace('fa-pause', 'fa-play');
-                        fullScreenPlayPauseIcon.classList.replace('fa-pause', 'fa-play');
+                        pauseCurrentSong(); // Just update icons if paused
                     }
                     miniPlayer.style.display = 'flex'; 
                     loopBtn.classList.toggle('active', isLooping);
@@ -1229,6 +1523,7 @@
             localStorage.setItem('currentPlayingSongId', currentPlayingSongId);
             localStorage.setItem('lastKnownTime', 0); 
 
+            // Update active class for the song list
             document.querySelectorAll('.music-item').forEach(item => {
                 if (item.getAttribute('data-id') == song.id) {
                     item.classList.add('active-play');
@@ -1245,7 +1540,7 @@
                 if (allSongs.length > 0) {
                     loadSong(allSongs[0]);
                 } else {
-                    alert("No songs available to play. Please add some songs to songs.json.");
+                    showToast("No songs available to play. Please add some songs.", 'error');
                     return;
                 }
             }
@@ -1267,11 +1562,11 @@
                     fullScreenPlayPauseIcon.classList.replace('fa-pause', 'fa-play'); // Sync full screen icon
                     localStorage.setItem('isPlaying', 'false');
                     if (e.name === 'NotAllowedError') {
-                        alert("Playback blocked by browser. Please tap the play button again to start.");
+                        showToast("Playback blocked by browser. Please tap the play button again to start.", 'warning');
                     } else if (e.name === 'AbortError') {
                         console.warn("Audio playback aborted (often normal if changing songs quickly).");
                     } else {
-                        alert(`An unexpected audio error occurred: ${e.message}`);
+                        showToast(`An unexpected audio error occurred: ${e.message}`, 'error');
                     }
                 });
         }
@@ -1293,6 +1588,14 @@
         }
 
         function getSongContext() {
+            // If a playlist is being viewed and is being played from, use its songs as context.
+            // Otherwise, default to allSongs.
+            if (currentViewingPlaylistId) {
+                const playlist = userPlaylists.find(p => p.id === currentViewingPlaylistId);
+                if (playlist) {
+                    return playlist.songs.map(songId => findSongById(songId)).filter(Boolean); // Get song objects
+                }
+            }
             return allSongs; 
         }
 
@@ -1329,6 +1632,7 @@
                 playCurrentSong();
             } else {
                 resetPlayerState(); 
+                showToast("End of playlist/queue.", 'info');
             }
         }
 
@@ -1340,7 +1644,13 @@
                 loadSong(prevSongObj);
                 playCurrentSong();
             } else {
-                resetPlayerState(); 
+                // If at the start and not looping, reset or just go to start of current song
+                if (audioPlayer.currentTime > 3) { // If song played for more than 3 seconds, restart it
+                    audioPlayer.currentTime = 0;
+                } else {
+                    resetPlayerState(); 
+                    showToast("Start of playlist/queue.", 'info');
+                }
             }
         }
 
@@ -1382,6 +1692,7 @@
             loopBtn.classList.toggle('active', isLooping);
             fullScreenLoopBtn.classList.toggle('active', isLooping); // Sync full screen loop
             localStorage.setItem('isLooping', isLooping);
+            showToast(isLooping ? 'Loop Enabled' : 'Loop Disabled', 'info');
         }
 
         function updateVolume() {
@@ -1409,6 +1720,10 @@
             localStorage.removeItem('isPlaying');
             localStorage.removeItem('lastKnownTime');
             renderAllSongs(); 
+            renderUserPlaylists(); // Re-render to clear active state in playlists if any
+            if (currentViewingPlaylistId) { // If a playlist modal is open, update its songs too
+                openPlaylistDetailModal(currentViewingPlaylistId);
+            }
         }
 
         // --- Notification & Media Session API ---
@@ -1490,20 +1805,170 @@
             }
         }
 
-        // --- Playlist Management ---
+        // --- General Modal Functions ---
+        function openModal(modalElement) {
+            modalElement.style.display = 'flex';
+        }
+
+        function closeModal(modalElement) {
+            modalElement.style.display = 'none';
+        }
+
+        // --- Playlist Management Modals ---
         function openCreatePlaylistModal() {
-            const newPlaylistId = 'playlist_' + Date.now();
-            const newPlaylistName = prompt("Enter new playlist name:");
-            if (newPlaylistName) {
+            playlistFormModalTitle.textContent = "Create New Playlist";
+            playlistNameInput.value = '';
+            playlistImageInput.value = '';
+            playlistForm.setAttribute('data-mode', 'create');
+            openModal(playlistFormModal);
+        }
+
+        function handlePlaylistFormSubmit(event) {
+            event.preventDefault();
+            const playlistName = playlistNameInput.value.trim();
+            const playlistImage = playlistImageInput.value.trim();
+            const mode = playlistForm.getAttribute('data-mode');
+
+            if (!playlistName) {
+                showToast("Playlist name cannot be empty.", 'error');
+                return;
+            }
+
+            if (mode === 'create') {
+                const newPlaylistId = 'playlist_' + Date.now();
                 userPlaylists.push({
                     id: newPlaylistId,
-                    name: newPlaylistName,
-                    image: 'https://via.placeholder.com/100/ADD8E6/000000?text=' + encodeURIComponent(newPlaylistName.substring(0,1).toUpperCase()),
+                    name: playlistName,
+                    image: playlistImage || null,
                     songs: [] 
                 });
+                showToast("Playlist created successfully!", 'success');
+            }
+            
+            localStorage.setItem('userPlaylists', JSON.stringify(userPlaylists));
+            renderUserPlaylists();
+            closeModal(playlistFormModal);
+        }
+
+        function confirmDeletePlaylist(playlistId) {
+            confirmActionModal("Delete Playlist", "Are you sure you want to delete this playlist? This action cannot be undone.", () => {
+                userPlaylists = userPlaylists.filter(p => p.id !== playlistId);
                 localStorage.setItem('userPlaylists', JSON.stringify(userPlaylists));
                 renderUserPlaylists();
+                showToast("Playlist deleted.", 'info');
+            });
+        }
+
+        function confirmActionModal(title, message, callback) {
+            confirmationModalTitle.textContent = title;
+            confirmationModalMessage.textContent = message;
+            confirmActionCallback = callback; // Store the callback
+            openModal(confirmationModal);
+        }
+        
+        function openPlaylistDetailModal(playlistId) {
+            const playlist = userPlaylists.find(p => p.id === playlistId);
+            if (!playlist) {
+                showToast("Playlist not found.", 'error');
+                return;
             }
+            currentViewingPlaylistId = playlistId;
+
+            modalPlaylistImage.src = playlist.image || 'https://via.placeholder.com/120/ADD8E6/000000?text=' + encodeURIComponent(playlist.name.substring(0,1).toUpperCase());
+            modalPlaylistName.textContent = playlist.name;
+            modalPlaylistSongCount.textContent = `${playlist.songs.length} song${playlist.songs.length === 1 ? '' : 's'}`;
+            
+            renderSongsInPlaylistModal(playlist);
+            openModal(playlistDetailModal);
+        }
+
+        function addSongsToPlaylist(playlistId, songIds) {
+            const playlist = userPlaylists.find(p => p.id === playlistId);
+            if (playlist) {
+                songIds.forEach(songId => {
+                    if (!playlist.songs.includes(songId)) {
+                        playlist.songs.push(songId);
+                    }
+                });
+                localStorage.setItem('userPlaylists', JSON.stringify(userPlaylists));
+                showToast(`${songIds.length} song${songIds.length === 1 ? '' : 's'} added.`, 'success');
+                openPlaylistDetailModal(playlistId); // Re-render playlist detail
+            } else {
+                showToast("Error: Playlist not found.", 'error');
+            }
+        }
+
+        function removeSongFromPlaylist(playlistId, songId) {
+            const playlist = userPlaylists.find(p => p.id === playlistId);
+            if (playlist) {
+                playlist.songs = playlist.songs.filter(id => id !== songId);
+                localStorage.setItem('userPlaylists', JSON.stringify(userPlaylists));
+                showToast("Song removed from playlist.", 'info');
+                // Check if the removed song was the currently playing one from this playlist context
+                if (currentPlayingSongId == songId && getSongContext() === playlist.songs.map(sId => findSongById(sId)).filter(Boolean)) {
+                    // Decide if you want to stop playback or go to next song
+                    // For now, let's just re-render and let general player logic handle ended events
+                }
+                openPlaylistDetailModal(playlistId); // Re-render playlist detail
+            }
+        }
+
+        function openAddSongsToPlaylistModal() {
+            const currentPlaylist = userPlaylists.find(p => p.id === currentViewingPlaylistId);
+            if (currentPlaylist) {
+                songsToAddQueue = new Set(); // Reset queue for new selection
+                renderAllSongsForAdding(currentPlaylist.songs);
+                addSongsSearchInput.value = ''; // Clear search input
+                openModal(addSongsToPlaylistModal);
+            } else {
+                showToast("No playlist selected.", 'error');
+            }
+        }
+        
+        // --- Toast Notifications (simple) ---
+        function showToast(message, type = 'info', duration = 3000) {
+            let toast = document.getElementById('toast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'toast';
+                toast.style.cssText = `
+                    position: fixed;
+                    bottom: ${parseInt(getComputedStyle(document.documentElement).getPropertyValue('--mini-player-height')) + parseInt(getComputedStyle(document.documentElement).getPropertyValue('--bottom-nav-height')) + 20}px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background-color: rgba(0, 0, 0, 0.8);
+                    color: white;
+                    padding: 10px 20px;
+                    border-radius: 5px;
+                    z-index: 1000;
+                    opacity: 0;
+                    transition: opacity 0.3s ease-in-out;
+                    font-size: 0.9rem;
+                    min-width: 150px;
+                    text-align: center;
+                `;
+                document.body.appendChild(toast);
+            }
+
+            toast.textContent = message;
+            if (type === 'success') {
+                toast.style.backgroundColor = '#4CAF50';
+            } else if (type === 'error') {
+                toast.style.backgroundColor = '#F44336';
+            } else if (type === 'warning') {
+                toast.style.backgroundColor = '#FFC107';
+                toast.style.color = '#333';
+            } else { // info
+                toast.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+                toast.style.color = 'white';
+            }
+
+            toast.style.opacity = 1;
+
+            clearTimeout(toast.timeoutId);
+            toast.timeoutId = setTimeout(() => {
+                toast.style.opacity = 0;
+            }, duration);
         }
 
         // --- Full Screen Player Logic ---
@@ -1586,17 +2051,90 @@
                 const playlistCard = e.target.closest('.playlist-card');
 
                 if (deleteBtn) {
-                    e.stopPropagation(); 
+                    e.stopPropagation(); // Prevent opening playlist detail
                     const playlistIdToDelete = deleteBtn.getAttribute('data-playlist-id');
-                    if (confirm("Are you sure you want to delete this playlist?")) {
-                        userPlaylists = userPlaylists.filter(p => p.id !== playlistIdToDelete);
-                        localStorage.setItem('userPlaylists', JSON.stringify(userPlaylists));
-                        renderUserPlaylists();
-                        alert("Playlist deleted.");
-                    }
+                    confirmDeletePlaylist(playlistIdToDelete);
                 } else if (playlistCard) {
                     const playlistId = playlistCard.getAttribute('data-playlist-id');
-                    alert(`Opening playlist: ${userPlaylists.find(p => p.id === playlistId)?.name || 'Unknown Playlist'}`);
+                    openPlaylistDetailModal(playlistId);
+                }
+            });
+
+            // Playlist Form Modal
+            playlistForm.addEventListener('submit', handlePlaylistFormSubmit);
+            document.querySelector('#playlistFormModal .close-modal').addEventListener('click', () => closeModal(playlistFormModal));
+
+            // Confirmation Modal
+            cancelConfirmBtn.addEventListener('click', () => {
+                closeModal(confirmationModal);
+                confirmActionCallback = null;
+            });
+            confirmActionBtn.addEventListener('click', () => {
+                if (confirmActionCallback) {
+                    confirmActionCallback();
+                }
+                closeModal(confirmationModal);
+                confirmActionCallback = null;
+            });
+
+            // Playlist Detail Modal
+            document.querySelector('#playlistDetailModal .close-modal').addEventListener('click', () => {
+                closeModal(playlistDetailModal);
+                currentViewingPlaylistId = null; // Reset
+            });
+            addSongsToCurrentPlaylistBtn.addEventListener('click', openAddSongsToPlaylistModal);
+            
+            modalPlaylistSongsList.addEventListener('click', (e) => {
+                const musicItem = e.target.closest('.music-item');
+                const removeBtn = e.target.closest('.remove-song-btn');
+
+                if (removeBtn) {
+                    const songIdToRemove = removeBtn.getAttribute('data-song-id');
+                    confirmActionModal("Remove Song", "Are you sure you want to remove this song from the playlist?", () => {
+                        removeSongFromPlaylist(currentViewingPlaylistId, songIdToRemove);
+                    });
+                } else if (musicItem) {
+                    const songId = musicItem.getAttribute('data-id');
+                    const songToPlay = findSongById(songId);
+                    if (songToPlay) {
+                        loadSong(songToPlay);
+                        playCurrentSong();
+                        // Optionally close playlist detail after playing
+                        // closeModal(playlistDetailModal); 
+                    }
+                }
+            });
+
+            playPlaylistBtn.addEventListener('click', () => {
+                const playlist = userPlaylists.find(p => p.id === currentViewingPlaylistId);
+                if (playlist && playlist.songs.length > 0) {
+                    const firstSong = findSongById(playlist.songs[0]);
+                    if (firstSong) {
+                        loadSong(firstSong);
+                        playCurrentSong();
+                        closeModal(playlistDetailModal); // Close the modal after starting playback
+                    }
+                } else {
+                    showToast("Playlist is empty. Add songs first!", 'warning');
+                }
+            });
+
+            // Add Songs to Playlist Modal
+            document.querySelector('#addSongsToPlaylistModal .close-modal').addEventListener('click', () => {
+                closeModal(addSongsToPlaylistModal);
+                songsToAddQueue.clear(); // Clear queue if modal is closed without saving
+            });
+            addSongsSearchInput.addEventListener('input', () => {
+                const currentPlaylist = userPlaylists.find(p => p.id === currentViewingPlaylistId);
+                renderAllSongsForAdding(currentPlaylist ? currentPlaylist.songs : []);
+            });
+            saveAddedSongsBtn.addEventListener('click', () => {
+                if (currentViewingPlaylistId && songsToAddQueue.size > 0) {
+                    addSongsToPlaylist(currentViewingPlaylistId, Array.from(songsToAddQueue));
+                    closeModal(addSongsToPlaylistModal);
+                    songsToAddQueue.clear(); // Clear queue after saving
+                } else {
+                    showToast("No songs selected to add.", 'info');
                 }
             });
 
