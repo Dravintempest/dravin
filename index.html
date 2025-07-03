@@ -340,9 +340,10 @@
             color: var(--text-color);
         }
 
+        /* New playlist layout */
         .list-header {
             display: grid;
-            grid-template-columns: 50px 1fr;
+            grid-template-columns: 1fr; /* Only for title now */
             padding: 10px;
             font-weight: bold;
             border-bottom: 1px solid #ddd;
@@ -381,7 +382,7 @@
             display: flex;
             justify-content: space-between;
             font-size: 0.85rem;
-            padding-left: 40px;
+            padding-left: 40px; /* Match with image width + gap */
         }
 
         .music-artist {
@@ -419,83 +420,6 @@
 
         .loop-btn.active {
             color: var(--primary-color);
-        }
-
-        /* Notification Style */
-        .notification {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: var(--card-bg);
-            color: var(--text-color);
-            padding: 15px 25px;
-            border-radius: 50px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            z-index: 1000;
-            opacity: 0;
-            transition: opacity 0.3s, transform 0.3s;
-            max-width: 80%;
-        }
-        
-        .notification.show {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-        }
-        
-        .notification.hide {
-            opacity: 0;
-            transform: translateX(-50%) translateY(100px);
-        }
-        
-        .notification-img {
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
-            object-fit: cover;
-        }
-        
-        .notification-info {
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .notification-title {
-            font-weight: bold;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            max-width: 250px;
-        }
-        
-        .notification-artist {
-            font-size: 0.8rem;
-            color: var(--primary-color);
-        }
-        
-        .notification-close {
-            margin-left: 15px;
-            cursor: pointer;
-            opacity: 0.7;
-        }
-        
-        .notification-close:hover {
-            opacity: 1;
-        }
-        
-        @media (max-width: 600px) {
-            .notification {
-                width: 90%;
-                max-width: 90%;
-                padding: 12px 20px;
-            }
-            
-            .notification-title {
-                max-width: 150px;
-            }
         }
 
         /* Scrollbar styling */
@@ -581,25 +505,14 @@
                 <input type="text" id="searchInput" placeholder="Cari judul atau artis...">
             </div>
             <div class="list-header">
-                <div class="header-item">#</div>
-                <div class="header-item">Judul</div>
+                <div class="header-item" style="display: none;">#</div>
+                <div class="header-item" style="display: none;">Judul</div>
             </div>
             <div id="musicListContainer"></div>
         </div>
     </div>
 
     <audio id="audioPlayer"></audio>
-
-    <div class="notification" id="notification">
-        <img src="" alt="Album Art" class="notification-img" id="notificationImg">
-        <div class="notification-info">
-            <div class="notification-title" id="notificationTitle">Judul Lagu</div>
-            <div class="notification-artist" id="notificationArtist">Artis</div>
-        </div>
-        <div class="notification-close" id="notificationClose">
-            <i class="fas fa-times"></i>
-        </div>
-    </div>
 
     <script>
         let songs = []; // Inisialisasi kosong, nanti akan diisi dari songs.json
@@ -625,24 +538,18 @@
         const requestBtn = document.getElementById('requestBtn');
         const playlistBtn = document.getElementById('playlistBtn');
         const searchInput = document.getElementById('searchInput');
-        
-        // Notification elements
-        const notification = document.getElementById('notification');
-        const notificationImg = document.getElementById('notificationImg');
-        const notificationTitle = document.getElementById('notificationTitle');
-        const notificationArtist = document.getElementById('notificationArtist');
-        const notificationClose = document.getElementById('notificationClose');
 
         // Player state
         let currentSongIndex = 0;
         let isPlaying = false;
         let isLooping = false;
-        let notificationTimeout;
+        let currentNotification = null; // To store the notification object
 
         // Initialize player
         async function initPlayer() {
             await loadSongsFromJSON(); // Tunggu hingga lagu dimuat
             updateThemeToggle();
+            requestNotificationPermission();
         }
 
         // Load songs from songs.json
@@ -681,9 +588,6 @@
             currentTitle.textContent = song.title;
             currentArtist.textContent = song.artist;
             currentDetails.textContent = `Released: ${song.releaseDate} • Duration: ${song.duration}`;
-            
-            // Tampilkan notifikasi
-            showNotification(song);
 
             // Update active song in playlist
             const musicItems = document.querySelectorAll('.music-item');
@@ -691,37 +595,11 @@
             if (musicItems[index]) {
                 musicItems[index].classList.add('active');
             }
+
+            updateMediaSession(song);
         }
 
-        // Show notification
-        function showNotification(song) {
-            // Clear previous timeout if exists
-            if (notificationTimeout) {
-                clearTimeout(notificationTimeout);
-            }
-            
-            // Update notification content
-            notificationImg.src = song.thumbnail;
-            notificationTitle.textContent = song.title;
-            notificationArtist.textContent = song.artist;
-            
-            // Show notification
-            notification.classList.remove('hide');
-            notification.classList.add('show');
-            
-            // Auto hide after 5 seconds
-            notificationTimeout = setTimeout(() => {
-                hideNotification();
-            }, 5000);
-        }
-
-        // Hide notification
-        function hideNotification() {
-            notification.classList.remove('show');
-            notification.classList.add('hide');
-        }
-
-        // Render playlist
+        // Render playlist with new layout
         function renderPlaylist() {
             musicListContainer.innerHTML = '';
             
@@ -733,7 +611,6 @@
                 }
                 
                 musicItem.innerHTML = `
-                    <div class="music-number">${index + 1}</div>
                     <div class="music-title-container">
                         <div class="music-title">
                             <img src="${song.thumbnail}" alt="${song.title}" class="music-img">
@@ -745,6 +622,7 @@
                         </div>
                     </div>
                 `;
+                // Removed music-number as per request
                 
                 musicItem.addEventListener('click', () => {
                     currentSongIndex = index;
@@ -761,6 +639,7 @@
             audioPlayer.play();
             isPlaying = true;
             playPauseIcon.classList.replace('fa-play', 'fa-pause');
+            showMediaNotification(songs[currentSongIndex]);
         }
 
         // Pause song
@@ -768,6 +647,7 @@
             audioPlayer.pause();
             isPlaying = false;
             playPauseIcon.classList.replace('fa-pause', 'fa-play');
+            // Optionally close notification or update it to "paused" state if supported
         }
 
         // Previous song
@@ -875,6 +755,81 @@
             });
         }
 
+        // --- Notification and Media Session API changes ---
+
+        // Request notification permission
+        function requestNotificationPermission() {
+            if ('Notification' in window) {
+                Notification.requestPermission().then(permission => {
+                    if (permission === 'granted') {
+                        console.log('Notification permission granted.');
+                    } else if (permission === 'denied') {
+                        console.warn('Notification permission denied.');
+                    }
+                });
+            }
+        }
+
+        // Show media notification
+        function showMediaNotification(song) {
+            if ('Notification' in window && Notification.permission === 'granted') {
+                // Close previous notification if it exists
+                if (currentNotification) {
+                    currentNotification.close();
+                }
+
+                const options = {
+                    body: song.artist, // Changed to artist
+                    icon: song.thumbnail,
+                    image: song.thumbnail, // Display thumbnail as image in notification
+                    tag: 'music-player-notification', // Group notifications
+                    renotify: true, // Show again if new notification with same tag comes
+                    silent: true, // Don't make a sound when updating
+                    data: { url: 'https://dr4vin.vercel.app' } // Keep the base URL
+                };
+
+                currentNotification = new Notification(song.title, options);
+
+                currentNotification.onclick = function() {
+                    window.focus(); // Bring the tab to front
+                    this.close();
+                };
+            }
+        }
+
+        // Update Media Session API metadata and actions
+        function updateMediaSession(song) {
+            if ('mediaSession' in navigator) {
+                navigator.mediaSession.metadata = new MediaMetadata({
+                    title: song.title,
+                    artist: song.artist,
+                    album: 'Dravin Music', // You might want to get this from your song data
+                    artwork: [
+                        { src: song.thumbnail, sizes: '96x96', type: 'image/jpeg' },
+                        { src: song.thumbnail, sizes: '128x128', type: 'image/jpeg' },
+                        { src: song.thumbnail, sizes: '192x192', type: 'image/jpeg' },
+                        { src: song.thumbnail, sizes: '256x256', type: 'image/jpeg' },
+                        { src: song.thumbnail, sizes: '384x384', type: 'image/jpeg' },
+                        { src: song.thumbnail, sizes: '512x512', type: 'image/jpeg' },
+                    ]
+                });
+
+                navigator.mediaSession.setActionHandler('play', () => {
+                    playSong();
+                });
+                navigator.mediaSession.setActionHandler('pause', () => {
+                    pauseSong();
+                });
+                navigator.mediaSession.setActionHandler('previoustrack', () => {
+                    prevSong();
+                });
+                navigator.mediaSession.setActionHandler('nexttrack', () => {
+                    nextSong();
+                });
+                // Optional: add other handlers like seekto, stop, etc.
+            }
+        }
+
         // Event listeners
         playPauseBtn.addEventListener('click', () => {
             isPlaying ? pauseSong() : playSong();
@@ -912,8 +867,6 @@
         playlistBtn.addEventListener('click', () => {
             window.location.href = 'playlist.html';
         });
-
-        notificationClose.addEventListener('click', hideNotification);
 
         // Initialize
         checkThemePreference();
