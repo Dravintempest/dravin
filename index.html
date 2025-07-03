@@ -6,7 +6,6 @@
     <title>Dravin Music Web</title>
     <link rel="icon" type="image/png" href="favicon.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
     <style>
         :root {
             --primary-color: #4a76a8;
@@ -439,6 +438,7 @@
             opacity: 1;
         }
 
+        /* Modal styles are no longer directly used for Add/Request Song, but kept for potential future use or playlist details */
         .modal {
             display: none;
             position: fixed;
@@ -544,6 +544,7 @@
             color: white;
         }
 
+        /* Simplified Profile Container */
         .profile-container {
             text-align: center;
             padding: 20px;
@@ -560,62 +561,7 @@
             align-items: center;
         }
 
-        .profile-img {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-bottom: 15px;
-            border: 3px solid var(--primary-color);
-        }
-
-        .profile-name {
-            font-size: 1.8rem;
-            font-weight: 600;
-            margin-bottom: 5px;
-        }
-
-        .profile-email {
-            color: #777;
-            font-size: 1rem;
-            margin-bottom: 20px;
-        }
-
-        .profile-stats {
-            display: flex;
-            justify-content: space-around;
-            width: 100%;
-            max-width: 400px;
-            margin-top: 20px;
-        }
-
-        .stat-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .stat-item .value {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary-color);
-        }
-
-        .stat-item .label {
-            font-size: 0.9rem;
-            color: #777;
-        }
-
-        .profile-settings {
-            background-color: var(--card-bg);
-            padding: 30px;
-            border-radius: 10px;
-            box-shadow: var(--shadow);
-            text-align: left;
-        }
-
-        .profile-settings h3 {
+        .profile-info h3 {
             font-size: 1.5rem;
             color: var(--primary-color);
             margin-bottom: 20px;
@@ -628,6 +574,7 @@
             align-items: center;
             padding: 15px 0;
             border-bottom: 1px solid var(--control-bg);
+            width: 100%; /* Ensure it spans full width of its container */
         }
         .setting-item:last-child {
             border-bottom: none;
@@ -643,23 +590,7 @@
         .setting-item label i {
             color: var(--primary-color);
         }
-
-        .logout-btn {
-            width: 100%;
-            margin-top: 30px;
-            background-color: #f44336;
-            border: none;
-            color: white;
-            padding: 12px 20px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 1rem;
-            transition: background-color 0.3s;
-        }
-        .logout-btn:hover {
-            background-color: #d32f2f;
-        }
-
+        
         .switch {
             position: relative;
             display: inline-block;
@@ -777,7 +708,7 @@
 <body>
     <div class="main-content">
         <div id="homeContent" class="content-section active">
-            <h2>Discover</h2>
+            <h2>DRAVIN MUSIC</h2>
             <div class="search-box">
                 <i class="fas fa-search"></i>
                 <input type="text" id="searchInputHome" placeholder="Search song or artist...">
@@ -806,52 +737,9 @@
         </div>
 
         <div id="profileContent" class="content-section">
-            <div id="profileLoggedOut" style="text-align: center; padding: 50px;">
-                <i class="fas fa-user-circle" style="font-size: 4rem; color: #aaa; margin-bottom: 20px;"></i>
-                <h2>Login to personalize your experience</h2>
-                <p style="margin-bottom: 30px;">Access your settings, listening history, and more.</p>
-                <div id="g_id_onload"
-                     data-client_id="YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com"
-                     data-callback="handleCredentialResponse"
-                     data-auto_prompt="false">
-                </div>
-                <div class="g_id_signin"
-                     data-type="standard"
-                     data-size="large"
-                     data-theme="outline"
-                     data-text="sign_in_with"
-                     data-shape="rectangular"
-                     data-logo_alignment="left">
-                </div>
-            </div>
-
-            <div id="profileLoggedIn" class="profile-container" style="display: none;">
+            <div class="profile-container">
                 <div class="profile-info">
-                    <img id="profileImage" class="profile-img" src="https://via.placeholder.com/100" alt="Profile Picture">
-                    <h3 id="profileName" class="profile-name">Guest User</h3>
-                    <p id="profileEmail" class="profile-email"></p>
-                    <div class="profile-stats">
-                        <div class="stat-item">
-                            <span class="value" id="songsListenedCount">0</span>
-                            <span class="label">Songs Listened</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="value" id="listeningTimeTotal">0m</span>
-                            <span class="label">Listening Time</span>
-                        </div>
-                    </div>
-                    
-                    <button class="btn" id="addSongBtn" style="margin-top: 20px; width: 100%;">
-                        <i class="fas fa-plus"></i> Add Song
-                    </button>
-                    
-                    <button class="btn btn-outline" id="requestSongBtn" style="margin-top: 10px; width: 100%;">
-                        <i class="fas fa-paper-plane"></i> Request Song
-                    </button>
-                </div>
-
-                <div class="profile-settings">
-                    <h3>Settings</h3>
+                    <h3>Settings & Information</h3>
                     <div class="setting-item">
                         <label for="themeToggle"><i class="fas fa-adjust"></i> Dark Mode</label>
                         <label class="switch">
@@ -859,7 +747,9 @@
                             <span class="slider"></span>
                         </label>
                     </div>
-                    <button class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+                    <a href="https://wa.me/6283122563863?text=Halo%2C%20saya%20ingin%20request%20lagu%3A%0AJudul%3A%20%0AArtis%3A%20" target="_blank" class="btn" id="requestSongBtn" style="margin-top: 20px; width: 100%;">
+                        <i class="fab fa-whatsapp"></i> Request Song via WhatsApp
+                    </a>
                 </div>
             </div>
         </div>
@@ -914,66 +804,6 @@
         </a>
     </div>
 
-    <div class="modal" id="addSongModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Add New Song</h2>
-                <span class="close-modal" id="closeAddSongModal">&times;</span>
-            </div>
-            <form id="addSongForm">
-                <div class="form-group">
-                    <label for="newSongTitle">Title:</label>
-                    <input type="text" id="newSongTitle" placeholder="Song Title" required>
-                </div>
-                <div class="form-group">
-                    <label for="newSongArtist">Artist:</label>
-                    <input type="text" id="newSongArtist" placeholder="Artist Name" required>
-                </div>
-                <div class="form-group">
-                    <label for="newSongMp3">MP3 URL:</label>
-                    <input type="url" id="newSongMp3" placeholder="https://example.com/song.mp3" required>
-                </div>
-                <div class="form-group">
-                    <label for="newSongThumbnail">Thumbnail URL:</label>
-                    <input type="url" id="newSongThumbnail" placeholder="https://example.com/thumbnail.jpg" required>
-                </div>
-                <div class="form-group">
-                    <label for="newSongReleaseDate">Release Date:</label>
-                    <input type="date" id="newSongReleaseDate" required>
-                </div>
-                <button type="submit" class="btn" id="submitNewSongBtn">
-                    <i class="fas fa-paper-plane"></i> Submit for Approval
-                </button>
-            </form>
-        </div>
-    </div>
-
-    <div class="modal" id="requestSongModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Request a Song</h2>
-                <span class="close-modal" id="closeRequestSongModal">&times;</span>
-            </div>
-            <form id="requestSongForm">
-                <div class="form-group">
-                    <label for="requestSongTitle">Title:</label>
-                    <input type="text" id="requestSongTitle" placeholder="Song Title" required>
-                </div>
-                <div class="form-group">
-                    <label for="requestSongArtist">Artist:</label>
-                    <input type="text" id="requestSongArtist" placeholder="Artist Name" required>
-                </div>
-                <div class="form-group">
-                    <label for="requestSongDescription">Description (Optional):</label>
-                    <textarea id="requestSongDescription" placeholder="Any additional information about this song request..."></textarea>
-                </div>
-                <button type="submit" class="btn" id="submitRequestBtn">
-                    <i class="fas fa-paper-plane"></i> Submit Request
-                </button>
-            </form>
-        </div>
-    </div>
-
     <audio id="audioPlayer"></audio>
 
     <script>
@@ -1016,40 +846,11 @@
         const createFirstPlaylistBtn = document.getElementById('createFirstPlaylistBtn');
 
         // Profile Section
-        const profileLoggedOut = document.getElementById('profileLoggedOut');
-        const profileLoggedIn = document.getElementById('profileLoggedIn');
-        const profileImage = document.getElementById('profileImage');
-        const profileName = document.getElementById('profileName');
-        const profileEmail = document.getElementById('profileEmail');
-        const songsListenedCount = document.getElementById('songsListenedCount');
-        const listeningTimeTotal = document.getElementById('listeningTimeTotal');
         const themeToggleCheckbox = document.getElementById('themeToggleCheckbox');
-        const logoutBtn = document.getElementById('logoutBtn');
-        const addSongBtn = document.getElementById('addSongBtn');
-        const requestSongBtn = document.getElementById('requestSongBtn');
-
-        // Add Song Modal
-        const addSongModal = document.getElementById('addSongModal');
-        const closeAddSongModal = document.getElementById('closeAddSongModal');
-        const addSongForm = document.getElementById('addSongForm');
-        const newSongTitle = document.getElementById('newSongTitle');
-        const newSongArtist = document.getElementById('newSongArtist');
-        const newSongMp3 = document.getElementById('newSongMp3');
-        const newSongThumbnail = document.getElementById('newSongThumbnail');
-        const newSongReleaseDate = document.getElementById('newSongReleaseDate');
-        const submitNewSongBtn = document.getElementById('submitNewSongBtn');
-
-        // Request Song Modal
-        const requestSongModal = document.getElementById('requestSongModal');
-        const closeRequestSongModal = document.getElementById('closeRequestSongModal');
-        const requestSongForm = document.getElementById('requestSongForm');
-        const requestSongTitle = document.getElementById('requestSongTitle');
-        const requestSongArtist = document.getElementById('requestSongArtist');
-        const requestSongDescription = document.getElementById('requestSongDescription');
-        const submitRequestBtn = document.getElementById('submitRequestBtn');
+        const requestSongBtn = document.getElementById('requestSongBtn'); // Still need this for the WhatsApp link
 
         // --- State Variables ---
-        let allSongs = [];
+        let allSongs = []; // Will be populated from songs.json
         let userPlaylists = JSON.parse(localStorage.getItem('userPlaylists')) || [];
         
         let currentPlayingSongId = localStorage.getItem('currentPlayingSongId') || null; 
@@ -1059,21 +860,13 @@
         let lastKnownVolume = parseFloat(localStorage.getItem('lastKnownVolume')) || 0.7;
 
         let currentActiveTab = 'home';
-        let currentViewingPlaylistId = null;
-        let editingPlaylistId = null;
-
-        // User Profile & Stats
-        let userProfile = JSON.parse(localStorage.getItem('userProfile')) || null;
-        let listeningStats = JSON.parse(localStorage.getItem('listeningStats')) || {
-            songsListened: 0,
-            totalListeningTime: 0
-        };
+        let currentViewingPlaylistId = null; // No longer used for modal, but could be for future playlist detail view
 
         // --- Initialization ---
         async function initApp() {
             await loadSongsFromJSON();
             checkThemePreference();
-            requestNotificationPermission();
+            requestNotificationPermission(); // Still good to have for media controls
             
             audioPlayer.volume = lastKnownVolume;
             volumeSlider.value = lastKnownVolume;
@@ -1083,7 +876,6 @@
             
             // Call this AFTER loading songs and setting initial volume
             syncPlayerStateFromLocalStorage();
-            updateProfileUI();
 
             setupEventListeners();
         }
@@ -1123,7 +915,7 @@
             } else if (tabName === 'profile') {
                 profileContent.classList.add('active');
                 profileTab.classList.add('active');
-                updateProfileUI();
+                // No specific UI updates needed for the simplified profile
             }
             currentActiveTab = tabName;
             localStorage.setItem('currentActiveTab', tabName);
@@ -1147,7 +939,7 @@
                 const musicItem = document.createElement('div');
                 musicItem.classList.add('music-item');
                 // Ensure correct active state when rendered
-                if (song.id === currentPlayingSongId) {
+                if (song.id == currentPlayingSongId) { // Use loose equality as localStorage stores as string
                     musicItem.classList.add('active-play');
                 }
                 musicItem.setAttribute('data-id', song.id);
@@ -1170,7 +962,7 @@
                 playlistsGrid.style.display = 'none';
                 return;
             } else {
-                emptyPlaylistsState.style.display = 'grid'; // Use 'grid' if you want it to behave like a grid, otherwise 'block'
+                emptyPlaylistsState.style.display = 'none'; // Hide empty state if there are playlists
                 playlistsGrid.style.display = 'grid'; // Ensure grid is displayed
             }
 
@@ -1215,13 +1007,12 @@
                 miniPlayer.style.display = 'none';
             }
             renderAllSongs(); // Update active state on visible songs
-            // If you have a playlist modal that shows songs, you'd call its render here too.
-            // renderCurrentPlaylistSongsInModal(currentViewingPlaylistId); // Assuming such a function exists
             renderUserPlaylists(); // Ensure playlists are updated
         }
 
         function findSongById(id) {
-            return allSongs.find(s => s.id === id);
+            // Ensure ID comparison is robust, as localStorage stores as string
+            return allSongs.find(s => s.id == id);
         }
 
         function loadSong(song) {
@@ -1245,7 +1036,7 @@
 
             // Update active class for all visible song items
             document.querySelectorAll('.music-item').forEach(item => {
-                if (item.getAttribute('data-id') === song.id) {
+                if (item.getAttribute('data-id') == song.id) {
                     item.classList.add('active-play');
                 } else {
                     item.classList.remove('active-play');
@@ -1257,21 +1048,11 @@
 
         function playCurrentSong() {
             if (!audioPlayer.src) {
-                let songToPlay = null;
-                // Attempt to load a default song if nothing is in the player
-                if (currentActiveTab === 'playlist' && userPlaylists.length > 0) {
-                    const targetPlaylist = userPlaylists.find(p => p.id === currentViewingPlaylistId) || userPlaylists[0];
-                    if (targetPlaylist && targetPlaylist.songs.length > 0) {
-                        songToPlay = targetPlaylist.songs[0];
-                    }
-                } else if (allSongs.length > 0) {
-                    songToPlay = allSongs[0];
-                }
-
-                if (songToPlay) {
-                    loadSong(songToPlay);
+                // If no song is loaded, try to load the first song from allSongs
+                if (allSongs.length > 0) {
+                    loadSong(allSongs[0]);
                 } else {
-                    alert("No songs available to play. Please add some songs.");
+                    alert("No songs available to play. Please add some songs to songs.json.");
                     return;
                 }
             }
@@ -1321,24 +1102,12 @@
         }
 
         function getSongContext() {
-            // This needs a modal for playlist songs to properly function with context
-            // If no specific playlist is being viewed (e.g., in a modal), default to all songs
-            // For now, let's assume if currentViewingPlaylistId is set, it means we're in a modal
-            // where playlist context matters. You'll need to define how 'viewPlaylistSongsModal' is triggered.
-            // If you don't have a playlist viewing modal, this logic needs adjustment.
-            // For simplicity, let's just use allSongs for now or the current playlist if one is open.
-            
-            if (currentViewingPlaylistId) { // Placeholder for when a playlist is open in a modal
-                const playlist = userPlaylists.find(p => p.id === currentViewingPlaylistId);
-                if (playlist && playlist.songs.length > 0) {
-                    return playlist.songs;
-                }
-            }
-            return allSongs; // Default context is all songs
+            // Without login or a complex playlist system, the context is always allSongs
+            return allSongs; 
         }
 
         function getNextSong(currentSongId, contextArray, loopEnabled) {
-            const currentIndex = contextArray.findIndex(song => song.id === currentSongId);
+            const currentIndex = contextArray.findIndex(song => song.id == currentSongId); // Use loose equality
             if (currentIndex === -1) return null;
 
             if (currentIndex < contextArray.length - 1) {
@@ -1350,7 +1119,7 @@
         }
 
         function getPrevSong(currentSongId, contextArray, loopEnabled) {
-            const currentIndex = contextArray.findIndex(song => song.id === currentSongId);
+            const currentIndex = contextArray.findIndex(song => song.id == currentSongId); // Use loose equality
             if (currentIndex === -1) return null;
 
             if (currentIndex > 0) {
@@ -1434,83 +1203,6 @@
             localStorage.removeItem('isPlaying');
             localStorage.removeItem('lastKnownTime');
             renderAllSongs(); // Re-render to remove active class
-            // If you have a playlist modal, ensure its state is updated too
-            // if (currentViewingPlaylistId) {
-            //      renderCurrentPlaylistSongsInModal(currentViewingPlaylistId);
-            // }
-        }
-
-        // --- Profile & Google Login ---
-        function handleCredentialResponse(response) {
-            const profile = JSON.parse(atob(response.credential.split('.')[1]));
-            userProfile = {
-                id: profile.sub,
-                name: profile.name,
-                email: profile.email,
-                picture: profile.picture
-            };
-            localStorage.setItem('userProfile', JSON.stringify(userProfile));
-            updateProfileUI();
-        }
-
-        function logout() {
-            // Check if google accounts library is loaded and gapi.client exists
-            if (typeof google !== 'undefined' && google.accounts && google.accounts.id) {
-                google.accounts.id.disableAutoSelect(); // Disables automatic sign-in attempts
-                console.log("Google auto-select disabled.");
-            } else {
-                console.warn("Google Accounts ID library not fully loaded for logout.");
-            }
-            
-            userProfile = null;
-            localStorage.removeItem('userProfile');
-            updateProfileUI();
-            alert("You have been logged out.");
-            showTab('profile'); // Return to the profile tab, showing logged out state
-        }
-
-        function updateProfileUI() {
-            if (userProfile) {
-                profileLoggedOut.style.display = 'none';
-                profileLoggedIn.style.display = 'block';
-                profileImage.src = userProfile.picture;
-                profileName.textContent = userProfile.name;
-                profileEmail.textContent = userProfile.email;
-                updateListeningStatsUI();
-            } else {
-                profileLoggedOut.style.display = 'block';
-                profileLoggedIn.style.display = 'none';
-            }
-        }
-
-        // --- Listening Statistics ---
-        function updateListeningStatsUI() {
-            songsListenedCount.textContent = listeningStats.songsListened;
-            const totalMinutes = Math.floor(listeningStats.totalListeningTime / 60);
-            const totalHours = Math.floor(totalMinutes / 60);
-            const remainingMinutes = totalMinutes % 60;
-
-            if (totalHours > 0) {
-                listeningTimeTotal.textContent = `${totalHours}h ${remainingMinutes}m`;
-            } else {
-                listeningTimeTotal.textContent = `${totalMinutes}m`;
-            }
-        }
-
-        function updateListeningStatsOnEnd() {
-            if (currentPlayingSongId) {
-                const playedSong = findSongById(currentPlayingSongId);
-                if (playedSong) {
-                    listeningStats.songsListened++;
-                    // Safely parse duration. Assuming "MM:SS" format.
-                    const durationParts = playedSong.duration.split(':').map(Number);
-                    const minutes = durationParts[0] || 0;
-                    const seconds = durationParts[1] || 0;
-                    listeningStats.totalListeningTime += (minutes * 60) + seconds;
-                    localStorage.setItem('listeningStats', JSON.stringify(listeningStats));
-                    updateListeningStatsUI();
-                }
-            }
         }
 
         // --- Notification & Media Session API ---
@@ -1599,11 +1291,8 @@
             }
         }
 
-        // --- Modal & Playlist Management (Simplified from original due to scope) ---
-        // For 'New Playlist' button click handler (modal not defined in HTML)
+        // --- Playlist Management ---
         function openCreatePlaylistModal() {
-            // In a real app, you'd show a modal for creating a new playlist here
-            // For now, let's add a dummy playlist for demonstration
             const newPlaylistId = 'playlist_' + Date.now();
             const newPlaylistName = prompt("Enter new playlist name:");
             if (newPlaylistName) {
@@ -1631,7 +1320,7 @@
                 const musicItem = e.target.closest('.music-item');
                 if (musicItem) {
                     const songId = musicItem.getAttribute('data-id');
-                    const songToPlay = allSongs.find(song => song.id === songId);
+                    const songToPlay = allSongs.find(song => song.id == songId); // Loose equality
                     if (songToPlay) {
                         loadSong(songToPlay);
                         playCurrentSong(); // Explicitly call play
@@ -1648,7 +1337,7 @@
             volumeSlider.addEventListener('input', updateVolume);
             audioPlayer.addEventListener('timeupdate', updateProgress);
             audioPlayer.addEventListener('ended', () => {
-                updateListeningStatsOnEnd();
+                // Listening stats removed as user profile is gone, but keep playNextSong logic
                 if (isLooping) {
                     audioPlayer.currentTime = 0;
                     audioPlayer.play();
@@ -1676,79 +1365,14 @@
                     }
                 } else if (playlistCard) {
                     const playlistId = playlistCard.getAttribute('data-playlist-id');
-                    // In a real app, you'd open a modal here to view/edit playlist songs
+                    // For now, just an alert, you'd integrate a modal to view/edit playlist songs here
                     alert(`Opening playlist: ${userPlaylists.find(p => p.id === playlistId)?.name || 'Unknown Playlist'}`);
-                    // Example: Implement a function to open a playlist details modal
-                    // openPlaylistDetailsModal(playlistId);
                 }
             });
-
 
             // Profile Section
             themeToggleCheckbox.addEventListener('change', toggleTheme);
-            logoutBtn.addEventListener('click', logout);
-            addSongBtn.addEventListener('click', () => {
-                addSongModal.style.display = 'flex';
-            });
-            requestSongBtn.addEventListener('click', () => {
-                requestSongModal.style.display = 'flex';
-            });
-
-            // Add Song Modal
-            closeAddSongModal.addEventListener('click', () => {
-                addSongModal.style.display = 'none';
-            });
-            addSongForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                
-                const title = newSongTitle.value.trim();
-                const artist = newSongArtist.value.trim();
-                const mp3 = newSongMp3.value.trim();
-                const thumbnail = newSongThumbnail.value.trim();
-                const releaseDate = newSongReleaseDate.value.trim();
-                
-                if (!title || !artist || !mp3 || !thumbnail || !releaseDate) {
-                    alert('Please fill in all required fields.');
-                    return;
-                }
-                
-                // In a real application, you would send this data to a backend server
-                // for approval and to be added to your 'songs.json' (or database).
-                console.log("New song submission:", { title, artist, mp3, thumbnail, releaseDate });
-                alert('Song submitted for admin approval. Thank you!');
-                addSongForm.reset();
-                addSongModal.style.display = 'none';
-            });
-
-            // Request Song Modal
-            closeRequestSongModal.addEventListener('click', () => {
-                requestSongModal.style.display = 'none';
-            });
-            requestSongForm.addEventListener('submit', (e) => {
-                e.preventDefault();
-                
-                const title = requestSongTitle.value.trim();
-                const artist = requestSongArtist.value.trim();
-                const description = requestSongDescription.value.trim();
-                const requestedBy = userProfile ? userProfile.name : 'Anonymous';
-                
-                if (!title || !artist) {
-                    alert('Please fill in at least the title and artist.');
-                    return;
-                }
-                
-                // In a real application, you would send this data to a backend server
-                console.log("Song request submission:", { title, artist, description, requestedBy });
-                alert('Song request submitted. Thank you!');
-                requestSongForm.reset();
-                requestSongModal.style.display = 'none';
-            });
-
-            // General modal closing by clicking outside
-            window.addEventListener('click', (e) => {
-                if (e.target === addSongModal) addSongModal.style.display = 'none';
-                if (e.target === requestSongModal) requestSongModal.style.display = 'none';
-            });
+            // Request Song button now handled by direct href in HTML, no JS listener needed for this action
         }
 
         // Initialize the application when the DOM is fully loaded
