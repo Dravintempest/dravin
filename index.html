@@ -15,7 +15,7 @@
             --control-bg: #eee;
             --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             --highlight: #4a76a8;
-            --mini-player-height: 70px; /* Lebih kecil */
+            --mini-player-height: 80px;
             --bottom-nav-height: 65px;
         }
 
@@ -216,22 +216,38 @@
             box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.1);
             display: flex;
             align-items: center;
-            padding: 0 15px; /* Padding disesuaikan */
-            gap: 10px; /* Gap disesuaikan */
+            padding: 0 15px;
+            gap: 10px;
             z-index: 99;
-            cursor: pointer; /* Menandakan bisa diklik */
+            cursor: pointer;
         }
         .dark-mode .mini-player {
              border-top-color: #2d2d2d;
         }
 
         .mini-player-img {
-            width: 50px; /* Ukuran gambar disesuaikan */
-            height: 50px; /* Ukuran gambar disesuaikan */
+            width: 50px;
+            height: 50px;
             border-radius: 5px;
             object-fit: cover;
             flex-shrink: 0;
-            cursor: pointer; /* Menandakan bisa diklik */
+            cursor: pointer;
+            position: relative;
+        }
+
+        .mini-player-img:hover::after {
+            content: attr(data-title);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            z-index: 100;
         }
 
         .mini-player-info {
@@ -245,12 +261,12 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            font-size: 0.95rem; /* Ukuran font disesuaikan */
-            margin-bottom: 2px; /* Margin disesuaikan */
+            font-size: 0.95rem;
+            margin-bottom: 2px;
         }
 
         .mini-player-artist {
-            font-size: 0.8rem; /* Ukuran font disesuaikan */
+            font-size: 0.8rem;
             color: var(--primary-color);
             white-space: nowrap;
             overflow: hidden;
@@ -260,28 +276,28 @@
         .mini-player-controls {
             display: flex;
             align-items: center;
-            gap: 10px; /* Gap disesuaikan */
+            gap: 10px;
             flex-shrink: 0;
         }
 
         .mini-player-controls .control-btn {
-            font-size: 1rem; /* Ukuran ikon disesuaikan */
-            width: 30px; /* Ukuran tombol disesuaikan */
-            height: 30px; /* Ukuran tombol disesuaikan */
+            font-size: 1rem;
+            width: 30px;
+            height: 30px;
         }
 
         .mini-player-controls .play-pause {
-            width: 40px; /* Ukuran tombol play/pause disesuaikan */
-            height: 40px; /* Ukuran tombol play/pause disesuaikan */
-            font-size: 1.2rem; /* Ukuran ikon play/pause disesuaikan */
+            width: 40px;
+            height: 40px;
+            font-size: 1.2rem;
         }
 
         .mini-player-progress-container {
             position: absolute;
-            top: 0;
+            bottom: 0;
             left: 0;
             width: 100%;
-            height: 3px; /* Tinggi progress bar */
+            height: 3px;
             background-color: var(--control-bg);
             cursor: pointer;
         }
@@ -297,6 +313,10 @@
         }
 
         .loop-btn.active {
+            color: var(--primary-color);
+        }
+
+        .shuffle-btn.active {
             color: var(--primary-color);
         }
 
@@ -536,6 +556,7 @@
             margin-top: 15px;
             display: flex;
             gap: 10px;
+            flex-wrap: wrap;
         }
         .modal-playlist-songs {
             margin-top: 20px;
@@ -557,6 +578,49 @@
             padding-right: 50px; /* Space for add button */
         }
 
+        /* File Input Styling */
+        .file-input-container {
+            position: relative;
+            margin-bottom: 15px;
+        }
+        
+        .file-input-label {
+            display: block;
+            padding: 10px;
+            border: 1px dashed #ddd;
+            border-radius: 5px;
+            text-align: center;
+            cursor: pointer;
+            background-color: var(--control-bg);
+        }
+        
+        .file-input-label:hover {
+            border-color: var(--primary-color);
+        }
+        
+        .file-input {
+            position: absolute;
+            width: 0.1px;
+            height: 0.1px;
+            opacity: 0;
+            overflow: hidden;
+            z-index: -1;
+        }
+        
+        .file-preview {
+            max-width: 100%;
+            max-height: 200px;
+            margin-top: 10px;
+            display: none;
+            border-radius: 5px;
+        }
+        
+        .file-input-text {
+            display: block;
+            margin-top: 5px;
+            font-size: 0.9rem;
+            color: #777;
+        }
 
         .btn {
             background-color: var(--primary-color);
@@ -887,6 +951,15 @@
                 width: 95%;
             }
 
+            .modal-playlist-header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .modal-playlist-actions {
+                justify-content: center;
+            }
+
             .full-screen-album-art {
                 width: 90%;
                 max-width: 300px; /* Lebih kecil di mobile */
@@ -974,7 +1047,7 @@
     </div>
 
     <div class="mini-player" id="miniPlayer" style="display: none;">
-        <img id="miniPlayerImg" class="mini-player-img" src="" alt="">
+        <img id="miniPlayerImg" class="mini-player-img" src="" alt="" data-title="">
         <div class="mini-player-info">
             <div id="miniPlayerTitle" class="mini-player-title"></div>
             <div id="miniPlayerArtist" class="mini-player-artist"></div>
@@ -1002,6 +1075,9 @@
         </div>
         <button class="control-btn loop-btn" id="loopBtn">
             <i class="fas fa-redo"></i>
+        </button>
+        <button class="control-btn shuffle-btn" id="shuffleBtn">
+            <i class="fas fa-random"></i>
         </button>
     </div>
 
@@ -1058,6 +1134,9 @@
         <button class="control-btn loop-btn" id="fullScreenLoopBtn">
             <i class="fas fa-redo"></i>
         </button>
+        <button class="control-btn shuffle-btn" id="fullScreenShuffleBtn">
+            <i class="fas fa-random"></i>
+        </button>
     </div>
 
     <audio id="audioPlayer"></audio>
@@ -1072,11 +1151,48 @@
                 <label for="playlistNameInput">Playlist Name:</label>
                 <input type="text" id="playlistNameInput" required>
 
-                <label for="playlistImageInput">Image URL (optional):</label>
+                <div class="file-input-container">
+                    <label class="file-input-label" for="playlistImageFileInput">
+                        <i class="fas fa-image" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                        <div>Click to upload playlist cover</div>
+                        <span class="file-input-text">or paste image URL below</span>
+                    </label>
+                    <input type="file" id="playlistImageFileInput" class="file-input" accept="image/*">
+                    <img id="playlistImagePreview" class="file-preview" src="" alt="Playlist Cover Preview">
+                </div>
+
+                <label for="playlistImageInput">Or paste image URL:</label>
                 <input type="text" id="playlistImageInput" placeholder="e.g., https://example.com/playlist_cover.jpg">
-                <small style="display: block; margin-bottom: 15px; color: #777;">Paste a direct image URL for the playlist cover.</small>
                 
                 <button type="submit" class="btn">Save Playlist</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="editPlaylistModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Edit Playlist</h3>
+                <span class="close-modal" data-modal="editPlaylistModal">&times;</span>
+            </div>
+            <form id="editPlaylistForm">
+                <label for="editPlaylistNameInput">Playlist Name:</label>
+                <input type="text" id="editPlaylistNameInput" required>
+
+                <div class="file-input-container">
+                    <label class="file-input-label" for="editPlaylistImageFileInput">
+                        <i class="fas fa-image" style="font-size: 2rem; margin-bottom: 10px;"></i>
+                        <div>Click to change playlist cover</div>
+                        <span class="file-input-text">or paste image URL below</span>
+                    </label>
+                    <input type="file" id="editPlaylistImageFileInput" class="file-input" accept="image/*">
+                    <img id="editPlaylistImagePreview" class="file-preview" src="" alt="Playlist Cover Preview">
+                </div>
+
+                <label for="editPlaylistImageInput">Or paste image URL:</label>
+                <input type="text" id="editPlaylistImageInput" placeholder="e.g., https://example.com/playlist_cover.jpg">
+                
+                <button type="submit" class="btn">Save Changes</button>
             </form>
         </div>
     </div>
@@ -1110,6 +1226,12 @@
                         </button>
                         <button class="btn btn-outline" id="playPlaylistBtn">
                             <i class="fas fa-play"></i> Play All
+                        </button>
+                        <button class="btn btn-outline" id="editPlaylistBtn">
+                            <i class="fas fa-edit"></i> Edit
+                        </button>
+                        <button class="btn btn-outline" id="shufflePlaylistBtn">
+                            <i class="fas fa-random"></i> Shuffle
                         </button>
                     </div>
                 </div>
@@ -1159,6 +1281,7 @@
         const prevBtn = document.getElementById('prevBtn');
         const nextBtn = document.getElementById('nextBtn');
         const loopBtn = document.getElementById('loopBtn');
+        const shuffleBtn = document.getElementById('shuffleBtn');
         const progressBar = document.getElementById('miniPlayerProgressBar');
         const progress = document.getElementById('miniPlayerProgress');
         const currentTimeDisplay = document.getElementById('miniPlayerCurrentTime');
@@ -1187,7 +1310,7 @@
         const fullScreenNextBtn = document.getElementById('fullScreenNextBtn');
         const fullScreenVolumeSlider = document.getElementById('fullScreenVolumeSlider');
         const fullScreenLoopBtn = document.getElementById('fullScreenLoopBtn');
-
+        const fullScreenShuffleBtn = document.getElementById('fullScreenShuffleBtn');
 
         // Home Section
         const searchInputHome = document.getElementById('searchInputHome');
@@ -1209,6 +1332,15 @@
         const playlistNameInput = document.getElementById('playlistNameInput');
         const playlistImageInput = document.getElementById('playlistImageInput');
         const playlistForm = document.getElementById('playlistForm');
+        const playlistImageFileInput = document.getElementById('playlistImageFileInput');
+        const playlistImagePreview = document.getElementById('playlistImagePreview');
+
+        const editPlaylistModal = document.getElementById('editPlaylistModal');
+        const editPlaylistForm = document.getElementById('editPlaylistForm');
+        const editPlaylistNameInput = document.getElementById('editPlaylistNameInput');
+        const editPlaylistImageInput = document.getElementById('editPlaylistImageInput');
+        const editPlaylistImageFileInput = document.getElementById('editPlaylistImageFileInput');
+        const editPlaylistImagePreview = document.getElementById('editPlaylistImagePreview');
 
         const confirmationModal = document.getElementById('confirmationModal');
         const confirmationModalTitle = document.getElementById('confirmationModalTitle');
@@ -1223,6 +1355,8 @@
         const modalPlaylistSongCount = document.getElementById('modalPlaylistSongCount');
         const addSongsToCurrentPlaylistBtn = document.getElementById('addSongsToCurrentPlaylistBtn');
         const playPlaylistBtn = document.getElementById('playPlaylistBtn');
+        const editPlaylistBtn = document.getElementById('editPlaylistBtn');
+        const shufflePlaylistBtn = document.getElementById('shufflePlaylistBtn');
         const modalPlaylistSongsList = document.getElementById('modalPlaylistSongsList');
         const emptyPlaylistSongsState = document.getElementById('emptyPlaylistSongsState');
 
@@ -1238,12 +1372,15 @@
         let currentPlayingSongId = localStorage.getItem('currentPlayingSongId') || null; 
         let isPlaying = localStorage.getItem('isPlaying') === 'true';
         let isLooping = localStorage.getItem('isLooping') === 'true';
+        let isShuffling = localStorage.getItem('isShuffling') === 'true';
         let lastKnownTime = parseFloat(localStorage.getItem('lastKnownTime')) || 0;
         let lastKnownVolume = parseFloat(localStorage.getItem('lastKnownVolume')) || 0.7;
 
         let currentActiveTab = 'home';
         let currentViewingPlaylistId = null; // ID of the playlist currently open in playlistDetailModal
         let songsToAddQueue = new Set(); // Stores song IDs to add to playlist
+        let currentPlaylistContext = []; // Stores the current playlist context for shuffle
+        let shuffledPlaylist = []; // Stores the shuffled version of the playlist
 
 
         // --- Initialization ---
@@ -1357,7 +1494,7 @@
                 const playlistCard = document.createElement('div');
                 playlistCard.classList.add('playlist-card');
                 playlistCard.setAttribute('data-playlist-id', playlist.id);
-                const imageUrl = playlist.image || 'https://via.placeholder.com/100/4a76a8/ffffff?text=' + encodeURIComponent(playlist.name.substring(0,1).toUpperCase());
+                const imageUrl = playlist.image || getDefaultPlaylistImage(playlist.name);
                 playlistCard.innerHTML = `
                     <img src="${imageUrl}" alt="${playlist.name}">
                     <h3>${playlist.name}</h3>
@@ -1368,6 +1505,13 @@
                 `;
                 playlistsGrid.appendChild(playlistCard);
             });
+        }
+
+        function getDefaultPlaylistImage(playlistName) {
+            const colors = ['#4a76a8', '#4a8ca8', '#4aa8a1', '#4aa86b', '#6ba84a', '#a8a14a', '#a87b4a', '#a84a4a'];
+            const colorIndex = playlistName.charCodeAt(0) % colors.length;
+            const initial = playlistName.substring(0,1).toUpperCase();
+            return `https://via.placeholder.com/100/${colors[colorIndex].substring(1)}/ffffff?text=${encodeURIComponent(initial)}`;
         }
 
         function renderSongsInPlaylistModal(playlist) {
@@ -1483,6 +1627,8 @@
                     miniPlayer.style.display = 'flex'; 
                     loopBtn.classList.toggle('active', isLooping);
                     fullScreenLoopBtn.classList.toggle('active', isLooping); // Sync full screen loop
+                    shuffleBtn.classList.toggle('active', isShuffling);
+                    fullScreenShuffleBtn.classList.toggle('active', isShuffling); // Sync full screen shuffle
                 } else {
                     resetPlayerState();
                 }
@@ -1506,6 +1652,7 @@
 
             // Update mini-player
             miniPlayerImg.src = song.thumbnail;
+            miniPlayerImg.setAttribute('data-title', song.title); // Set title for hover
             miniPlayerTitle.textContent = song.title;
             miniPlayerArtist.textContent = song.artist;
             
@@ -1593,7 +1740,8 @@
             if (currentViewingPlaylistId) {
                 const playlist = userPlaylists.find(p => p.id === currentViewingPlaylistId);
                 if (playlist) {
-                    return playlist.songs.map(songId => findSongById(songId)).filter(Boolean); // Get song objects
+                    currentPlaylistContext = playlist.songs.map(songId => findSongById(songId)).filter(Boolean);
+                    return isShuffling ? shuffledPlaylist : currentPlaylistContext;
                 }
             }
             return allSongs; 
@@ -1652,6 +1800,50 @@
                     showToast("Start of playlist/queue.", 'info');
                 }
             }
+        }
+
+        function toggleShuffle() {
+            isShuffling = !isShuffling;
+            shuffleBtn.classList.toggle('active', isShuffling);
+            fullScreenShuffleBtn.classList.toggle('active', isShuffling); // Sync full screen shuffle
+            localStorage.setItem('isShuffling', isShuffling);
+            
+            if (isShuffling && currentViewingPlaylistId) {
+                // Create a shuffled version of the current playlist
+                const playlist = userPlaylists.find(p => p.id === currentViewingPlaylistId);
+                if (playlist) {
+                    currentPlaylistContext = playlist.songs.map(songId => findSongById(songId)).filter(Boolean);
+                    shuffledPlaylist = [...currentPlaylistContext].sort(() => Math.random() - 0.5);
+                }
+            }
+            
+            showToast(isShuffling ? 'Shuffle Enabled' : 'Shuffle Disabled', 'info');
+        }
+
+        function shuffleAndPlayPlaylist(playlistId) {
+            const playlist = userPlaylists.find(p => p.id === playlistId);
+            if (!playlist || playlist.songs.length === 0) {
+                showToast("Playlist is empty. Add songs first!", 'warning');
+                return;
+            }
+            
+            currentViewingPlaylistId = playlistId;
+            currentPlaylistContext = playlist.songs.map(songId => findSongById(songId)).filter(Boolean);
+            shuffledPlaylist = [...currentPlaylistContext].sort(() => Math.random() - 0.5);
+            
+            // Play the first song in the shuffled playlist
+            if (shuffledPlaylist.length > 0) {
+                loadSong(shuffledPlaylist[0]);
+                playCurrentSong();
+            }
+            
+            // Enable shuffle mode
+            isShuffling = true;
+            shuffleBtn.classList.add('active');
+            fullScreenShuffleBtn.classList.add('active');
+            localStorage.setItem('isShuffling', 'true');
+            
+            closeModal(playlistDetailModal);
         }
 
         function updateProgress() {
@@ -1819,8 +2011,28 @@
             playlistFormModalTitle.textContent = "Create New Playlist";
             playlistNameInput.value = '';
             playlistImageInput.value = '';
+            playlistImagePreview.src = '';
+            playlistImagePreview.style.display = 'none';
             playlistForm.setAttribute('data-mode', 'create');
             openModal(playlistFormModal);
+        }
+
+        function openEditPlaylistModal(playlistId) {
+            const playlist = userPlaylists.find(p => p.id === playlistId);
+            if (!playlist) return;
+            
+            editPlaylistNameInput.value = playlist.name;
+            editPlaylistImageInput.value = playlist.image || '';
+            
+            if (playlist.image) {
+                editPlaylistImagePreview.src = playlist.image;
+                editPlaylistImagePreview.style.display = 'block';
+            } else {
+                editPlaylistImagePreview.style.display = 'none';
+            }
+            
+            editPlaylistForm.setAttribute('data-playlist-id', playlistId);
+            openModal(editPlaylistModal);
         }
 
         function handlePlaylistFormSubmit(event) {
@@ -1850,6 +2062,37 @@
             closeModal(playlistFormModal);
         }
 
+        function handleEditPlaylistFormSubmit(event) {
+            event.preventDefault();
+            const playlistId = editPlaylistForm.getAttribute('data-playlist-id');
+            const playlistName = editPlaylistNameInput.value.trim();
+            const playlistImage = editPlaylistImageInput.value.trim();
+
+            if (!playlistName) {
+                showToast("Playlist name cannot be empty.", 'error');
+                return;
+            }
+
+            const playlistIndex = userPlaylists.findIndex(p => p.id === playlistId);
+            if (playlistIndex !== -1) {
+                userPlaylists[playlistIndex].name = playlistName;
+                userPlaylists[playlistIndex].image = playlistImage || null;
+                
+                localStorage.setItem('userPlaylists', JSON.stringify(userPlaylists));
+                renderUserPlaylists();
+                
+                // Update the playlist detail modal if it's open for this playlist
+                if (currentViewingPlaylistId === playlistId) {
+                    modalPlaylistName.textContent = playlistName;
+                    modalPlaylistImage.src = playlistImage || getDefaultPlaylistImage(playlistName);
+                }
+                
+                showToast("Playlist updated successfully!", 'success');
+            }
+            
+            closeModal(editPlaylistModal);
+        }
+
         function confirmDeletePlaylist(playlistId) {
             confirmActionModal("Delete Playlist", "Are you sure you want to delete this playlist? This action cannot be undone.", () => {
                 userPlaylists = userPlaylists.filter(p => p.id !== playlistId);
@@ -1874,7 +2117,7 @@
             }
             currentViewingPlaylistId = playlistId;
 
-            modalPlaylistImage.src = playlist.image || 'https://via.placeholder.com/120/ADD8E6/000000?text=' + encodeURIComponent(playlist.name.substring(0,1).toUpperCase());
+            modalPlaylistImage.src = playlist.image || getDefaultPlaylistImage(playlist.name);
             modalPlaylistName.textContent = playlist.name;
             modalPlaylistSongCount.textContent = `${playlist.songs.length} song${playlist.songs.length === 1 ? '' : 's'}`;
             
@@ -1923,6 +2166,25 @@
             } else {
                 showToast("No playlist selected.", 'error');
             }
+        }
+        
+        // --- Image Upload Handling ---
+        function handleImageFileSelect(event, previewElement, urlInputElement) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            if (!file.type.match('image.*')) {
+                showToast("Please select an image file.", 'error');
+                return;
+            }
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                previewElement.src = e.target.result;
+                previewElement.style.display = 'block';
+                urlInputElement.value = ''; // Clear URL input when file is selected
+            };
+            reader.readAsDataURL(file);
         }
         
         // --- Toast Notifications (simple) ---
@@ -1981,6 +2243,7 @@
                 fullScreenPlayPauseIcon.classList.replace('fa-pause', 'fa-play');
             }
             fullScreenLoopBtn.classList.toggle('active', isLooping);
+            fullScreenShuffleBtn.classList.toggle('active', isShuffling);
             fullScreenVolumeSlider.value = audioPlayer.volume;
             updateProgress(); // Ensure progress bar and times are updated
         }
@@ -2015,6 +2278,7 @@
             prevBtn.addEventListener('click', playPrevSong);
             nextBtn.addEventListener('click', playNextSong);
             loopBtn.addEventListener('click', toggleLoop);
+            shuffleBtn.addEventListener('click', toggleShuffle);
             progressBar.addEventListener('click', setProgress);
             volumeSlider.addEventListener('input', updateVolume);
             audioPlayer.addEventListener('timeupdate', updateProgress);
@@ -2040,7 +2304,7 @@
             fullScreenProgressBar.addEventListener('click', setProgress);
             fullScreenVolumeSlider.addEventListener('input', updateFullScreenVolume);
             fullScreenLoopBtn.addEventListener('click', toggleLoop);
-
+            fullScreenShuffleBtn.addEventListener('click', toggleShuffle);
 
             // Playlist Section
             createNewPlaylistBtn.addEventListener('click', openCreatePlaylistModal);
@@ -2063,6 +2327,20 @@
             // Playlist Form Modal
             playlistForm.addEventListener('submit', handlePlaylistFormSubmit);
             document.querySelector('#playlistFormModal .close-modal').addEventListener('click', () => closeModal(playlistFormModal));
+            
+            // Image file input handling
+            playlistImageFileInput.addEventListener('change', (e) => {
+                handleImageFileSelect(e, playlistImagePreview, playlistImageInput);
+            });
+            
+            // Edit Playlist Form Modal
+            editPlaylistForm.addEventListener('submit', handleEditPlaylistFormSubmit);
+            document.querySelector('#editPlaylistModal .close-modal').addEventListener('click', () => closeModal(editPlaylistModal));
+            
+            // Image file input handling for edit modal
+            editPlaylistImageFileInput.addEventListener('change', (e) => {
+                handleImageFileSelect(e, editPlaylistImagePreview, editPlaylistImageInput);
+            });
 
             // Confirmation Modal
             cancelConfirmBtn.addEventListener('click', () => {
@@ -2083,6 +2361,16 @@
                 currentViewingPlaylistId = null; // Reset
             });
             addSongsToCurrentPlaylistBtn.addEventListener('click', openAddSongsToPlaylistModal);
+            editPlaylistBtn.addEventListener('click', () => {
+                if (currentViewingPlaylistId) {
+                    openEditPlaylistModal(currentViewingPlaylistId);
+                }
+            });
+            shufflePlaylistBtn.addEventListener('click', () => {
+                if (currentViewingPlaylistId) {
+                    shuffleAndPlayPlaylist(currentViewingPlaylistId);
+                }
+            });
             
             modalPlaylistSongsList.addEventListener('click', (e) => {
                 const musicItem = e.target.closest('.music-item');
