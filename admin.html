@@ -611,6 +611,74 @@
             color: #888;
             margin-top: 5px;
         }
+
+        /* New styles for JSON output */
+        .json-output-container {
+            margin-top: 30px;
+            background-color: var(--control-bg);
+            border-radius: 8px;
+            padding: 15px;
+            border: 1px solid #ddd;
+        }
+
+        .json-output-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .json-output-header h3 {
+            color: var(--primary-color);
+            margin: 0;
+        }
+
+        #copyJsonBtn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.3s;
+        }
+
+        #copyJsonBtn:hover {
+            background-color: var(--highlight);
+        }
+
+        #jsonOutput {
+            width: 100%;
+            min-height: 150px;
+            font-family: monospace;
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .copy-success {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: 1000;
+        }
+
+        .copy-success.show {
+            opacity: 1;
+        }
     </style>
 </head>
 <body>
@@ -686,8 +754,21 @@
 
         <h2>Current Songs</h2>
         <div class="admin-song-list" id="adminSongListContainer">
+            <!-- Songs will be listed here -->
+        </div>
+
+        <!-- New JSON Output Section -->
+        <div class="json-output-container">
+            <div class="json-output-header">
+                <h3>Current Songs Data (JSON)</h3>
+                <button id="copyJsonBtn"><i class="fas fa-copy"></i> Copy JSON</button>
             </div>
+            <pre id="jsonOutput">[]</pre>
+        </div>
     </div>
+
+    <!-- Copy Success Notification -->
+    <div class="copy-success" id="copySuccess">Copied to clipboard!</div>
 
     <script>
         // --- Theme Toggle Functionality (Copied from your index.html) ---
@@ -750,6 +831,9 @@
         const cancelEditBtn = document.getElementById('cancelEditBtn');
         const adminSongListContainer = document.getElementById('adminSongListContainer');
         const loadingDuration = document.getElementById('loadingDuration');
+        const jsonOutput = document.getElementById('jsonOutput');
+        const copyJsonBtn = document.getElementById('copyJsonBtn');
+        const copySuccess = document.getElementById('copySuccess');
 
         let currentSongs = []; // This will hold the songs data, initially from songs.json
 
@@ -815,6 +899,7 @@
         async function loadSongs() {
             currentSongs = await fetchSongs();
             renderAdminSongList();
+            updateJsonOutput();
         }
 
         // Render songs in the admin list
@@ -854,6 +939,11 @@
                     deleteSong(id);
                 });
             });
+        }
+
+        // Update JSON output
+        function updateJsonOutput() {
+            jsonOutput.textContent = JSON.stringify(currentSongs, null, 2);
         }
 
         // Clear the song form
@@ -897,6 +987,7 @@
 
             currentSongs.push(newSong);
             renderAdminSongList();
+            updateJsonOutput();
             clearSongForm();
             alert('Song added successfully (client-side only). This will NOT persist after refresh without a backend.');
         }
@@ -948,6 +1039,7 @@
                     duration
                 };
                 renderAdminSongList();
+                updateJsonOutput();
                 clearSongForm();
                 alert('Song updated successfully (client-side only). This will NOT persist after refresh without a backend.');
             }
@@ -958,6 +1050,7 @@
             if (confirm('Are you sure you want to delete this song?')) {
                 currentSongs = currentSongs.filter(song => song.id !== id);
                 renderAdminSongList();
+                updateJsonOutput();
                 alert('Song deleted successfully (client-side only). This will NOT persist after refresh without a backend.');
             }
         }
@@ -988,6 +1081,20 @@
             });
         }
 
+        // Copy JSON to clipboard
+        function copyJsonToClipboard() {
+            const jsonText = jsonOutput.textContent;
+            navigator.clipboard.writeText(jsonText).then(() => {
+                copySuccess.classList.add('show');
+                setTimeout(() => {
+                    copySuccess.classList.remove('show');
+                }, 2000);
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+                alert('Failed to copy JSON to clipboard. Please try again.');
+            });
+        }
+
         // Event Listeners
         loginBtn.addEventListener('click', handleLogin);
         logoutBtn.addEventListener('click', handleLogout);
@@ -998,6 +1105,7 @@
         addSongBtn.addEventListener('click', addSong);
         updateSongBtn.addEventListener('click', updateSong);
         cancelEditBtn.addEventListener('click', clearSongForm);
+        copyJsonBtn.addEventListener('click', copyJsonToClipboard);
 
         songMp3Input.addEventListener('change', async () => {
             const mp3Url = songMp3Input.value.trim();
