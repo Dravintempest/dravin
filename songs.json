@@ -1,47 +1,56 @@
 [
-    {
-        "id": 1,
-        "title": "Golden Hour",
-        "artist": "JVKE",
-        "mp3": "https://files.catbox.moe/9a7kkk.mp3",
-        "thumbnail": "https://i.scdn.co/image/ab67616d0000b2730af4476af141051c728ee8b9",
-        "releaseDate": "2022-10-03",
-        "duration": "3:29"
-    },
-    {
-        "id": 2,
-        "title": "Littleroot Town",
-        "artist": "Pokemon",
-        "mp3": "https://files.catbox.moe/7bzwfz.mp3",
-        "thumbnail": "https://files.catbox.moe/5g3j1a.jpg",
-        "releaseDate": "2019-11-29",
-        "duration": "3:20"
-    },
-    {
-        "id": 3,
-        "title": "3:03 PM",
-        "artist": "しゃろう Sharou",
-        "mp3": "https://files.catbox.moe/kk06is.mp3",
-        "thumbnail": "https://files.catbox.moe/q1ezdn.jpg",
-        "releaseDate": "2022-03-23",
-        "duration": "2:20"
-    },
-    {
-        "id": 4,
-        "title": "did i tell u that i miss u",
-        "artist": "Adore",
-        "mp3": "https://files.catbox.moe/dryhm1.mp3",
-        "thumbnail": "https://i.ytimg.com/vi_webp/ekW-i0KlU1U/mqdefault.webp",
-        "releaseDate": "2024-05-01",
-        "duration": "1:56"
-    },
-    {
-        "id": 5,
-        "title": "superstar",
-        "artist": "しゃろう Sharou",
-        "mp3": "https://files.catbox.moe/48c5t3.mp3",
-        "thumbnail": "https://i.scdn.co/image/ab67616d0000b273de67f686610bf4899f713479",
-        "releaseDate": "2023-03-14",
-        "duration": "2:28"
-    }
+  {
+    "id": 1,
+    "title": "Golden Hour",
+    "artist": "JVKE",
+    "mp3": "https://files.catbox.moe/9a7kkk.mp3",
+    "thumbnail": "https://i.scdn.co/image/ab67616d0000b2730af4476af141051c728ee8b9",
+    "releaseDate": "2022-10-03",
+    "duration": "3:51"
+  },
+  {
+    "id": 2,
+    "title": "Littleroot Town",
+    "artist": "Pokemon",
+    "mp3": "https://files.catbox.moe/7bzwfz.mp3",
+    "thumbnail": "https://files.catbox.moe/5g3j1a.jpg",
+    "releaseDate": "2019-11-29",
+    "duration": "1:24"
+  },
+  {
+    "id": 3,
+    "title": "3:03 PM",
+    "artist": "しゃろう Sharou",
+    "mp3": "https://files.catbox.moe/kk06is.mp3",
+    "thumbnail": "https://files.catbox.moe/q1ezdn.jpg",
+    "releaseDate": "2022-03-23",
+    "duration": "2:20"
+  },
+  {
+    "id": 4,
+    "title": "did i tell u that i miss u",
+    "artist": "Adore",
+    "mp3": "https://files.catbox.moe/dryhm1.mp3",
+    "thumbnail": "https://i.ytimg.com/vi_webp/ekW-i0KlU1U/mqdefault.webp",
+    "releaseDate": "2024-05-01",
+    "duration": "1:55"
+  },
+  {
+    "id": 5,
+    "title": "superstar",
+    "artist": "しゃろう Sharou",
+    "mp3": "https://files.catbox.moe/48c5t3.mp3",
+    "thumbnail": "https://i.scdn.co/image/ab67616d0000b273de67f686610bf4899f713479",
+    "releaseDate": "2023-03-14",
+    "duration": "2:27"
+  },
+  {
+    "id": 6,
+    "title": "blue",
+    "artist": "yung kai",
+    "mp3": "https://files.catbox.moe/11zbq3.mp3",
+    "thumbnail": "https://i.scdn.co/image/ab67616d0000b273ab6dae0093234139540657a0",
+    "releaseDate": "2024-08-02",
+    "duration": "3:34"
+  }
 ]
