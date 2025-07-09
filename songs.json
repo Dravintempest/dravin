@@ -37,74 +37,11 @@
     },
     {
         "id": 5,
-        "title": "NEON BLADE",
-        "artist": "INTERWORLD",
-        "mp3": "https://files.catbox.moe/3cybim.mp3",
-        "thumbnail": "https://i1.sndcdn.com/artworks-W3cQ9Ggvk4Hx-0-t500x500.jpg",
-        "releaseDate": "2022-09-22",
-        "duration": "2:35"
-    },
-    {
-        "id": 6,
-        "title": "METAMORPHOSIS",
-        "artist": "INTERWORLD",
-        "mp3": "https://files.catbox.moe/5v13o7.mp3",
-        "thumbnail": "https://i1.sndcdn.com/artworks-5yFzFl2kZnxA-0-t500x500.jpg",
-        "releaseDate": "2022-07-10",
-        "duration": "2:47"
-    },
-    {
-        "id": 7,
-        "title": "TRAP PHONK",
-        "artist": "KSLV Noh",
-        "mp3": "https://files.catbox.moe/fu1usx.mp3",
-        "thumbnail": "https://i1.sndcdn.com/artworks-cPL6dfPRfxvx-0-t500x500.jpg",
-        "releaseDate": "2022-04-05",
-        "duration": "2:12"
-    },
-    {
-        "id": 8,
-        "title": "DRIFT PHONK",
-        "artist": "Rauthentic",
-        "mp3": "https://files.catbox.moe/4s7bjo.mp3",
-        "thumbnail": "https://i1.sndcdn.com/artworks-3YkEQzOw6eZT-0-t500x500.jpg",
-        "releaseDate": "2023-01-16",
-        "duration": "2:20"
-    },
-    {
-        "id": 9,
-        "title": "Phonky Town",
-        "artist": "Playaphonk",
-        "mp3": "https://files.catbox.moe/74m98f.mp3",
-        "thumbnail": "https://i1.sndcdn.com/artworks-MOCME1Vg1Yy6-0-t500x500.jpg",
-        "releaseDate": "2021-08-12",
-        "duration": "2:48"
-    },
-    {
-        "id": 10,
-        "title": "Murder in My Mind",
-        "artist": "Kordhell",
-        "mp3": "https://files.catbox.moe/rwzohq.mp3",
-        "thumbnail": "https://i1.sndcdn.com/artworks-h3aW8xjmrthF-0-t500x500.jpg",
-        "releaseDate": "2022-05-01",
-        "duration": "2:17"
-    },
-    {
-        "id": 11,
-        "title": "RAVE",
-        "artist": "Dxrk ダーク",
-        "mp3": "https://files.catbox.moe/jazwnz.mp3",
-        "thumbnail": "https://i1.sndcdn.com/artworks-VFFOrxvHwZfY-0-t500x500.jpg",
-        "releaseDate": "2022-06-11",
-        "duration": "1:55"
-    },
-    {
-        "id": 12,
-        "title": "GHOST RIDER",
-        "artist": "Ghostface Playa",
-        "mp3": "https://files.catbox.moe/13u5h2.mp3",
-        "thumbnail": "https://i1.sndcdn.com/artworks-H5U1AAZV5HFe-0-t500x500.jpg",
-        "releaseDate": "2022-03-15",
-        "duration": "2:13"
+        "title": "superstar",
+        "artist": "しゃろう Sharou"
+        "mp3": "https://files.catbox.moe/48c5t3.mp3",
+        "thumbnail": "https://i.scdn.co/image/ab67616d0000b273de67f686610bf4899f713479",
+        "releaseDate": "2023-03-14",
+        "duration": "2:28"
     }
 ]
