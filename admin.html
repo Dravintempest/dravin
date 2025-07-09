@@ -6,8 +6,6 @@
     <title>Dravin Music - Admin Panel</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* Your existing CSS from :root to ::-webkit-scrollbar-thumb:hover */
-        /* Start of existing CSS */
         :root {
             --primary-color: #4a76a8;
             --bg-color: #f5f5f5;
@@ -63,8 +61,7 @@
             font-size: 2rem;
         }
 
-        /* Enhanced Button Styles */
-        .theme-toggle, .request-btn, .playlist-btn, .admin-btn { /* Added .admin-btn */
+        .theme-toggle, .request-btn, .playlist-btn, .admin-btn {
             background-color: transparent;
             color: var(--primary-color);
             border: 2px solid var(--primary-color);
@@ -83,18 +80,18 @@
             z-index: 1;
         }
 
-        .theme-toggle:hover, .request-btn:hover, .playlist-btn:hover, .admin-btn:hover { /* Added .admin-btn */
+        .theme-toggle:hover, .request-btn:hover, .playlist-btn:hover, .admin-btn:hover {
             color: white;
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
 
-        .theme-toggle:active, .request-btn:active, .playlist-btn:active, .admin-btn:active { /* Added .admin-btn */
+        .theme-toggle:active, .request-btn:active, .playlist-btn:active, .admin-btn:active {
             transform: translateY(0);
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
         }
 
-        .theme-toggle::before, .request-btn::before, .playlist-btn::before, .admin-btn::before { /* Added .admin-btn */
+        .theme-toggle::before, .request-btn::before, .playlist-btn::before, .admin-btn::before {
             content: '';
             position: absolute;
             top: 0;
@@ -111,7 +108,7 @@
         .theme-toggle:hover::before,
         .request-btn:hover::before,
         .playlist-btn:hover::before,
-        .admin-btn:hover::before { /* Added .admin-btn */
+        .admin-btn:hover::before {
             transform: scaleX(1);
             transform-origin: left;
         }
@@ -119,7 +116,7 @@
         .dark-mode .theme-toggle,
         .dark-mode .request-btn,
         .dark-mode .playlist-btn,
-        .dark-mode .admin-btn { /* Added .admin-btn */
+        .dark-mode .admin-btn {
             border-color: var(--primary-color);
             color: var(--primary-color);
         }
@@ -127,20 +124,18 @@
         .dark-mode .theme-toggle:hover,
         .dark-mode .request-btn:hover,
         .dark-mode .playlist-btn:hover,
-        .dark-mode .admin-btn:hover { /* Added .admin-btn */
+        .dark-mode .admin-btn:hover {
             color: white;
         }
 
-        /* Button Icons Animation */
-        .theme-toggle i, .request-btn i, .playlist-btn i, .admin-btn i { /* Added .admin-btn */
+        .theme-toggle i, .request-btn i, .playlist-btn i, .admin-btn i {
             transition: all 0.3s ease;
         }
 
-        .theme-toggle:hover i, .request-btn:hover i, .admin-btn:hover i { /* Added .admin-btn */
+        .theme-toggle:hover i, .request-btn:hover i, .admin-btn:hover i {
             transform: scale(1.1);
         }
 
-        /* Specific icon animations */
         @keyframes musicNote {
             0% { transform: translateY(0) scale(1); }
             50% { transform: translateY(-3px) scale(1.1); }
@@ -161,7 +156,6 @@
             animation: pulse 1.8s ease infinite;
         }
 
-        /* Rest of your existing CSS remains the same */
         .player-container {
             display: flex;
             flex-direction: column;
@@ -407,7 +401,6 @@
             color: var(--primary-color);
         }
 
-        /* Scrollbar styling */
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -425,9 +418,7 @@
         ::-webkit-scrollbar-thumb:hover {
             background: var(--highlight);
         }
-        /* End of existing CSS */
 
-        /* Admin-specific styles */
         .admin-section {
             background-color: var(--card-bg);
             border-radius: 15px;
@@ -459,7 +450,7 @@
         .form-group input[type="password"],
         .form-group input[type="url"],
         .form-group input[type="date"] {
-            width: calc(100% - 20px); /* Adjust for padding */
+            width: calc(100% - 20px);
             padding: 12px;
             border: 1px solid #ddd;
             border-radius: 8px;
@@ -591,11 +582,11 @@
         }
 
         .admin-song-item-actions button.edit-btn {
-            background-color: #28a745; /* Green */
+            background-color: #28a745;
         }
 
         .admin-song-item-actions button.delete-btn {
-            background-color: #dc3545; /* Red */
+            background-color: #dc3545;
         }
 
         .admin-song-item-actions button.edit-btn:hover {
@@ -612,7 +603,6 @@
             margin-top: 5px;
         }
 
-        /* New styles for JSON output */
         .json-output-container {
             margin-top: 30px;
             background-color: var(--control-bg);
@@ -679,6 +669,19 @@
         .copy-success.show {
             opacity: 1;
         }
+
+        .github-config {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .github-config h3 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
@@ -708,8 +711,26 @@
 
     <div id="adminPanelSection" class="admin-section" style="display: none;">
         <p class="welcome-message" id="welcomeMessage"></p>
-        <div class="admin-buttons">
-            <button id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+        
+        <div class="github-config">
+            <h3>GitHub Configuration</h3>
+            <div class="form-group">
+                <label for="githubRepo">Repository (owner/repo):</label>
+                <input type="text" id="githubRepo" value="Dravintempest/dravin">
+            </div>
+            <div class="form-group">
+                <label for="githubToken">GitHub Token:</label>
+                <input type="password" id="githubToken" placeholder="Enter your GitHub token">
+            </div>
+            <div class="form-group">
+                <label for="githubFilePath">File Path:</label>
+                <input type="text" id="githubFilePath" value="songs.json">
+            </div>
+            <div class="admin-buttons">
+                <button id="saveConfigBtn"><i class="fas fa-save"></i> Save Configuration</button>
+                <button id="testConnectionBtn"><i class="fas fa-plug"></i> Test Connection</button>
+            </div>
+            <p id="configMessage" style="margin-top: 10px;"></p>
         </div>
 
         <hr style="margin: 30px 0; border: none; border-top: 1px solid rgba(0,0,0,0.1);">
@@ -757,7 +778,6 @@
             <!-- Songs will be listed here -->
         </div>
 
-        <!-- New JSON Output Section -->
         <div class="json-output-container">
             <div class="json-output-header">
                 <h3>Current Songs Data (JSON)</h3>
@@ -767,11 +787,18 @@
         </div>
     </div>
 
-    <!-- Copy Success Notification -->
     <div class="copy-success" id="copySuccess">Copied to clipboard!</div>
 
     <script>
-        // --- Theme Toggle Functionality (Copied from your index.html) ---
+        // GitHub Integration
+        let githubConfig = {
+            repo: "Dravintempest/dravin",
+            token: "",
+            filePath: "songs.json",
+            lastSHA: ""
+        };
+
+        // Theme Toggle
         const themeToggle = document.getElementById('themeToggle');
 
         function toggleTheme() {
@@ -797,16 +824,6 @@
             }
             updateThemeToggle();
         }
-        checkThemePreference();
-        themeToggle.addEventListener('click', toggleTheme);
-
-        // --- Admin Panel Specific JavaScript ---
-
-        // Mock User Accounts (In a real app, these would be securely stored server-side)
-        const users = [
-            { username: 'admin', password: 'password123', name: 'Super Admin' },
-            { username: 'editor', password: 'edit123', name: 'Content Editor' }
-        ];
 
         // DOM Elements
         const loginSection = document.getElementById('loginSection');
@@ -835,12 +852,116 @@
         const copyJsonBtn = document.getElementById('copyJsonBtn');
         const copySuccess = document.getElementById('copySuccess');
 
-        let currentSongs = []; // This will hold the songs data, initially from songs.json
+        const githubRepoInput = document.getElementById('githubRepo');
+        const githubTokenInput = document.getElementById('githubToken');
+        const githubFilePathInput = document.getElementById('githubFilePath');
+        const saveConfigBtn = document.getElementById('saveConfigBtn');
+        const testConnectionBtn = document.getElementById('testConnectionBtn');
+        const configMessage = document.getElementById('configMessage');
 
+        let currentSongs = [];
         let loggedInUser = null;
         let editingSongId = null;
 
-        // --- Login/Logout Functions ---
+        // Load saved config from localStorage
+        function loadConfig() {
+            const savedConfig = localStorage.getItem('githubConfig');
+            if (savedConfig) {
+                githubConfig = JSON.parse(savedConfig);
+                githubRepoInput.value = githubConfig.repo;
+                githubTokenInput.value = githubConfig.token;
+                githubFilePathInput.value = githubConfig.filePath;
+            }
+        }
+
+        // Save config to localStorage
+        function saveConfig() {
+            githubConfig.repo = githubRepoInput.value.trim();
+            githubConfig.token = githubTokenInput.value.trim();
+            githubConfig.filePath = githubFilePathInput.value.trim();
+            localStorage.setItem('githubConfig', JSON.stringify(githubConfig));
+            configMessage.textContent = "Configuration saved!";
+            configMessage.style.color = "green";
+            setTimeout(() => configMessage.textContent = "", 3000);
+        }
+
+        // Test GitHub connection
+        async function testConnection() {
+            if (!githubConfig.token || !githubConfig.repo) {
+                configMessage.textContent = "Please enter both repository and token";
+                configMessage.style.color = "red";
+                return;
+            }
+
+            try {
+                const response = await fetch(`https://api.github.com/repos/${githubConfig.repo}/contents/${githubConfig.filePath}`, {
+                    headers: {
+                        "Authorization": `token ${githubConfig.token}`
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    githubConfig.lastSHA = data.sha;
+                    configMessage.textContent = "Connection successful!";
+                    configMessage.style.color = "green";
+                } else {
+                    configMessage.textContent = `Error: ${response.status} - ${response.statusText}`;
+                    configMessage.style.color = "red";
+                }
+            } catch (error) {
+                configMessage.textContent = `Connection failed: ${error.message}`;
+                configMessage.style.color = "red";
+            }
+        }
+
+        // GitHub API Functions
+        async function fetchSongsFromGitHub() {
+            try {
+                const response = await fetch(`https://api.github.com/repos/${githubConfig.repo}/contents/${githubConfig.filePath}`, {
+                    headers: {
+                        "Authorization": `token ${githubConfig.token}`
+                    }
+                });
+
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+                const data = await response.json();
+                githubConfig.lastSHA = data.sha;
+                return JSON.parse(atob(data.content));
+            } catch (error) {
+                console.error("Failed to fetch songs:", error);
+                return [];
+            }
+        }
+
+        async function updateSongsOnGitHub(songsData) {
+            try {
+                const response = await fetch(`https://api.github.com/repos/${githubConfig.repo}/contents/${githubConfig.filePath}`, {
+                    method: "PUT",
+                    headers: {
+                        "Authorization": `token ${githubConfig.token}`,
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        message: "Update songs via admin panel",
+                        content: btoa(JSON.stringify(songsData, null, 2)),
+                        sha: githubConfig.lastSHA
+                    })
+                });
+
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+
+                const result = await response.json();
+                githubConfig.lastSHA = result.content.sha;
+                return true;
+            } catch (error) {
+                console.error("Failed to update songs:", error);
+                return false;
+            }
+        }
+
+        // Login/Logout Functions
         function showLogin() {
             loginSection.style.display = 'block';
             adminPanelSection.style.display = 'none';
@@ -853,7 +974,7 @@
             loginSection.style.display = 'none';
             adminPanelSection.style.display = 'block';
             welcomeMessage.textContent = `Hello, ${loggedInUser.name}!`;
-            loadSongs(); // Load songs when admin panel is shown
+            loadSongs();
             clearSongForm();
         }
 
@@ -878,31 +999,18 @@
             showLogin();
         }
 
-        // --- Song Management Functions ---
-
-        // Function to fetch songs (simulated)
-        async function fetchSongs() {
-            try {
-                const response = await fetch('songs.json?v=' + new Date().getTime());
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                const data = await response.json();
-                return data;
-            } catch (error) {
-                console.error("Failed to fetch songs:", error);
-                return []; // Return empty array on error
-            }
-        }
-
-        // Load songs for admin panel
+        // Song Management Functions
         async function loadSongs() {
-            currentSongs = await fetchSongs();
+            if (!githubConfig.token) {
+                alert("Please configure GitHub access first");
+                return;
+            }
+
+            currentSongs = await fetchSongsFromGitHub();
             renderAdminSongList();
             updateJsonOutput();
         }
 
-        // Render songs in the admin list
         function renderAdminSongList() {
             adminSongListContainer.innerHTML = '';
             if (currentSongs.length === 0) {
@@ -925,7 +1033,6 @@
                 adminSongListContainer.appendChild(songItem);
             });
 
-            // Add event listeners for edit and delete buttons
             document.querySelectorAll('.edit-btn').forEach(button => {
                 button.addEventListener('click', (e) => {
                     const id = parseInt(e.currentTarget.dataset.id);
@@ -941,12 +1048,10 @@
             });
         }
 
-        // Update JSON output
         function updateJsonOutput() {
             jsonOutput.textContent = JSON.stringify(currentSongs, null, 2);
         }
 
-        // Clear the song form
         function clearSongForm() {
             songIdInput.value = '';
             songTitleInput.value = '';
@@ -961,7 +1066,6 @@
             editingSongId = null;
         }
 
-        // Add song (client-side only for this example)
         async function addSong() {
             const title = songTitleInput.value.trim();
             const artist = songArtistInput.value.trim();
@@ -986,13 +1090,17 @@
             };
 
             currentSongs.push(newSong);
-            renderAdminSongList();
-            updateJsonOutput();
-            clearSongForm();
-            alert('Song added successfully (client-side only). This will NOT persist after refresh without a backend.');
+            
+            const success = await updateSongsOnGitHub(currentSongs);
+            if (success) {
+                alert("Song added and saved to GitHub!");
+                loadSongs();
+                clearSongForm();
+            } else {
+                alert("Failed to save to GitHub");
+            }
         }
 
-        // Edit song (client-side only for this example)
         function editSong(id) {
             const songToEdit = currentSongs.find(song => song.id === id);
             if (songToEdit) {
@@ -1011,8 +1119,7 @@
             }
         }
 
-        // Update song (client-side only for this example)
-        function updateSong() {
+        async function updateSong() {
             if (!editingSongId) return;
 
             const title = songTitleInput.value.trim();
@@ -1038,24 +1145,32 @@
                     releaseDate,
                     duration
                 };
-                renderAdminSongList();
-                updateJsonOutput();
-                clearSongForm();
-                alert('Song updated successfully (client-side only). This will NOT persist after refresh without a backend.');
+                
+                const success = await updateSongsOnGitHub(currentSongs);
+                if (success) {
+                    alert("Song updated and saved to GitHub!");
+                    loadSongs();
+                    clearSongForm();
+                } else {
+                    alert("Failed to save to GitHub");
+                }
             }
         }
 
-        // Delete song (client-side only for this example)
-        function deleteSong(id) {
+        async function deleteSong(id) {
             if (confirm('Are you sure you want to delete this song?')) {
                 currentSongs = currentSongs.filter(song => song.id !== id);
-                renderAdminSongList();
-                updateJsonOutput();
-                alert('Song deleted successfully (client-side only). This will NOT persist after refresh without a backend.');
+                
+                const success = await updateSongsOnGitHub(currentSongs);
+                if (success) {
+                    alert("Song deleted and changes saved to GitHub!");
+                    loadSongs();
+                } else {
+                    alert("Failed to save to GitHub");
+                }
             }
         }
 
-        // --- Auto-calculate Duration from MP3 URL ---
         async function calculateDuration(mp3Url) {
             loadingDuration.style.display = 'block';
             songDurationInput.value = 'Calculating...';
@@ -1075,13 +1190,12 @@
                     console.error("Error loading audio for duration calculation:", e);
                     songDurationInput.value = 'Error';
                     loadingDuration.style.display = 'none';
-                    resolve('N/A'); // Indicate failure
+                    resolve('N/A');
                 });
-                audio.load(); // Start loading the audio
+                audio.load();
             });
         }
 
-        // Copy JSON to clipboard
         function copyJsonToClipboard() {
             const jsonText = jsonOutput.textContent;
             navigator.clipboard.writeText(jsonText).then(() => {
@@ -1095,11 +1209,17 @@
             });
         }
 
+        // Mock User Accounts
+        const users = [
+            { username: 'admin', password: 'password123', name: 'Super Admin' },
+            { username: 'editor', password: 'edit123', name: 'Content Editor' }
+        ];
+
         // Event Listeners
         loginBtn.addEventListener('click', handleLogin);
         logoutBtn.addEventListener('click', handleLogout);
         backToHomeBtn.addEventListener('click', () => {
-            window.location.href = 'index.html'; // Go back to your main music player page
+            window.location.href = 'index.html';
         });
 
         addSongBtn.addEventListener('click', addSong);
@@ -1116,7 +1236,14 @@
             }
         });
 
-        // Initial check for logged-in user
+        saveConfigBtn.addEventListener('click', saveConfig);
+        testConnectionBtn.addEventListener('click', testConnection);
+
+        // Initialize
+        checkThemePreference();
+        themeToggle.addEventListener('click', toggleTheme);
+        loadConfig();
+
         const savedUser = localStorage.getItem('loggedInUser');
         if (savedUser) {
             loggedInUser = JSON.parse(savedUser);
