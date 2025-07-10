@@ -52,5 +52,41 @@
     "thumbnail": "https://i.scdn.co/image/ab67616d0000b273ab6dae0093234139540657a0",
     "releaseDate": "2024-08-02",
     "duration": "3:34"
+  },
+  {
+    "id": 7,
+    "title": "Castle in the Mist",
+    "artist": "ICO",
+    "mp3": "https://spotify-api.mybackend.in/download/ICO/ICO%EF%BD%9E%E9%9C%A7%E3%81%AE%E4%B8%AD%E3%81%AE%E6%97%8B%E5%BE%8B%EF%BD%9E/Castle%20in%20the%20Mist-3NqHQ4V2U4wQuWlByWfa1r.mp3?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=fb1f22f7dff2534061496f49%2F20250710%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250710T055327Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=de9e46e889ad574a7f8f0120bd876893783f498e40f9f7b6caf39e09f490facb",
+    "thumbnail": "https://i.scdn.co/image/ab67616d0000b273696d4507a22528ab39af99e1",
+    "releaseDate": "2002-02-20",
+    "duration": "3:05"
+  },
+  {
+    "id": 8,
+    "title": "Drifting Away - Tower of Fantasy",
+    "artist": "NYMPHIE",
+    "mp3": "https://spotify-api.mybackend.in/download/NYMPHIE/Drifting%20Away%20-%20Tower%20of%20Fantasy/Drifting%20Away%20-%20Tower%20of%20Fantasy-3fHSFGu9UcjpBaOqQ0WpFk.mp3?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=fb1f22f7dff2534061496f49%2F20250710%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250710T061345Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=f792db4ed82675316563ffa70e9e58edbf4ec081de4f6d361e2078d913e692e9",
+    "thumbnail": "https://i.scdn.co/image/ab67616d0000b273ad4308839ecf45a792a1ae37",
+    "releaseDate": "2023-08-02",
+    "duration": "3:13"
+  },
+  {
+    "id": 9,
+    "title": "LOS VOLTAJE",
+    "artist": "Sayfalse, Yb Wasg'ood, Ariis",
+    "mp3": "https://spotify-api.mybackend.in/download/Sayfalse%2C%20Yb%20Wasg%27ood%2C%20Ariis/LOS%20VOLTAJE/LOS%20VOLTAJE-4LkkRLP8pldQer1YRrHwkx.mp3?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=fb1f22f7dff2534061496f49%2F20250710%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250710T061443Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=11c8274e14e0d7d93e067bbb629330438b029f1430f35c9018c668fdde460511",
+    "thumbnail": "https://i.scdn.co/image/ab67616d0000b273043844292d36333d42ece2a7",
+    "releaseDate": "2025-04-11",
+    "duration": "1:39"
+  },
+  {
+    "id": 10,
+    "title": "NUNCA MUDA?",
+    "artist": "Scythermane, NXGHT!, MC Fabinho da Osk",
+    "mp3": "https://spotify-api.mybackend.in/download/Scythermane%2C%20NXGHT%21%2C%20MC%20Fabinho%20da%20Osk/NUNCA%20MUDA%3F/NUNCA%20MUDA%3F-5EIjpM1B1VsLoKvv2iwd0P.mp3?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=fb1f22f7dff2534061496f49%2F20250710%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20250710T061517Z&X-Amz-Expires=3600&X-Amz-SignedHeaders=host&X-Amz-Signature=86b3a6e56afe51c5bfcd5480fcd3f893865c9f200b6c6100873d231ebe4b3f45",
+    "thumbnail": "https://i.scdn.co/image/ab67616d0000b273becceb2d3f6a694db50fcedf",
+    "releaseDate": "2025-01-09",
+    "duration": "1:21"
   }
 ]
