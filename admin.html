@@ -683,6 +683,35 @@
         .notification.error {
             background-color: #dc3545;
         }
+
+        .json-output {
+            background-color: var(--control-bg);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 30px;
+            font-family: monospace;
+            white-space: pre-wrap;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+        }
+        
+        .copy-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .copy-btn:hover {
+            background-color: var(--highlight);
+        }
     </style>
 </head>
 <body>
@@ -773,6 +802,14 @@
         <div class="admin-song-list" id="adminSongListContainer">
             <!-- Songs will be loaded here -->
         </div>
+
+        <h2>Current Songs JSON</h2>
+        <div class="json-output" id="jsonOutput">
+            <!-- JSON will appear here -->
+        </div>
+        <button class="copy-btn" id="copyJsonBtn">
+            <i class="fas fa-copy"></i> Copy JSON
+        </button>
     </div>
 
     <script>
@@ -850,6 +887,8 @@
         const spotifyUrlInput = document.getElementById('spotifyUrl');
         const fetchSpotifyBtn = document.getElementById('fetchSpotifyBtn');
         const spotifyLoading = document.getElementById('spotifyLoading');
+        const jsonOutput = document.getElementById('jsonOutput');
+        const copyJsonBtn = document.getElementById('copyJsonBtn');
 
         let currentSongs = [];
         let loggedInUser = null;
@@ -911,9 +950,14 @@
             }
         }
 
+        function updateJsonOutput() {
+            jsonOutput.textContent = JSON.stringify(currentSongs, null, 2);
+        }
+
         async function loadSongs() {
             currentSongs = await fetchSongs();
             renderAdminSongList();
+            updateJsonOutput();
         }
 
         function renderAdminSongList() {
@@ -994,6 +1038,7 @@
             currentSongs.push(newSong);
             renderAdminSongList();
             clearSongForm();
+            updateJsonOutput();
             showNotification('Song added successfully', 'success');
         }
 
@@ -1043,6 +1088,7 @@
                 };
                 renderAdminSongList();
                 clearSongForm();
+                updateJsonOutput();
                 showNotification('Song updated successfully', 'success');
             }
         }
@@ -1052,6 +1098,7 @@
             
             currentSongs = currentSongs.filter(song => song.id !== id);
             renderAdminSongList();
+            updateJsonOutput();
             showNotification('Song deleted successfully', 'success');
         }
 
@@ -1152,6 +1199,18 @@
             }
             
             fetchSpotifyData(spotifyUrl);
+        });
+
+        copyJsonBtn.addEventListener('click', () => {
+            const jsonText = JSON.stringify(currentSongs, null, 2);
+            navigator.clipboard.writeText(jsonText)
+                .then(() => {
+                    showNotification('JSON copied to clipboard!', 'success');
+                })
+                .catch(err => {
+                    console.error('Failed to copy: ', err);
+                    showNotification('Failed to copy JSON', 'error');
+                });
         });
 
         // Initial check for logged-in user
