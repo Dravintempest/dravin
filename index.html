@@ -44,7 +44,6 @@
             display: flex;
             flex-direction: column;
             min-height: 100vh;
-            overflow: hidden;
         }
 
         .main-content {
@@ -52,10 +51,12 @@
             padding: 20px;
             padding-bottom: calc(var(--mini-player-height) + var(--bottom-nav-height) + 20px);
             overflow-y: auto;
+            height: calc(100vh - var(--mini-player-height) - var(--bottom-nav-height));
         }
         
         .content-section {
             display: none;
+            height: 100%;
         }
         
         .content-section.active {
@@ -98,6 +99,8 @@
             display: flex;
             flex-direction: column;
             gap: 5px;
+            max-height: calc(100% - 60px);
+            overflow-y: auto;
         }
 
         .music-item {
@@ -217,7 +220,7 @@
             align-items: center;
             padding: 0 15px;
             gap: 10px;
-            z-index: 99;
+            z-index: 10;
             cursor: pointer;
         }
         .dark-mode .mini-player {
@@ -354,7 +357,7 @@
             display: flex;
             justify-content: space-around;
             align-items: center;
-            z-index: 100;
+            z-index: 11;
         }
         .dark-mode .bottom-nav {
              border-top-color: #2d2d2d;
@@ -1505,7 +1508,7 @@
             }
             
             currentActiveTab = tabName;
-            localStorage.setItem('currentActiveTab', tabName);
+            localStorage.setItem('currentActiveTab', currentActiveTab);
         }
 
         // --- Rendering Functions ---
