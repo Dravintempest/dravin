@@ -1084,47 +1084,33 @@
             fetchSpotifyBtn.disabled = true;
             
             try {
-                // First fetch from zenzxz API to get the download URL
-                const zenApiUrl = `https://zenzxz.dpdns.org/downloader/spotify?url=${encodeURIComponent(spotifyUrl)}`;
-                const zenResponse = await fetch(zenApiUrl);
+                // Menggunakan API Flow Falcon saja untuk semua data
+                const apiUrl = `https://flowfalcon.dpdns.org/download/spotify?url=${encodeURIComponent(spotifyUrl)}`;
+                const response = await fetch(apiUrl);
                 
-                if (!zenResponse.ok) {
-                    throw new Error(`HTTP error! status: ${zenResponse.status}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 
-                const zenData = await zenResponse.json();
+                const data = await response.json();
                 
-                if (!zenData.status || !zenData.data || !zenData.data.download) {
-                    throw new Error('Invalid response from zenzxz API');
-                }
-                
-                // Then fetch from original API to get other metadata
-                const originalApiUrl = `https://flowfalcon.dpdns.org/download/spotify?url=${encodeURIComponent(spotifyUrl)}`;
-                const originalResponse = await fetch(originalApiUrl);
-                
-                if (!originalResponse.ok) {
-                    throw new Error(`HTTP error! status: ${originalResponse.status}`);
-                }
-                
-                const originalData = await originalResponse.json();
-                
-                if (originalData.status && originalData.result) {
-                    // Combine data from both APIs
-                    songTitleInput.value = originalData.result.title || zenData.data.title || '';
-                    songArtistInput.value = originalData.result.artist || zenData.data.artist || '';
-                    songMp3Input.value = zenData.data.download || ''; // Use download URL from zenzxz
-                    songThumbnailInput.value = originalData.result.cover || zenData.data.image || '';
-                    songReleaseDateInput.value = originalData.result.releaseDate || '';
+                if (data.status && data.result) {
+                    // Mengisi form dengan data dari Flow Falcon
+                    songTitleInput.value = data.result.title || '';
+                    songArtistInput.value = data.result.artist || '';
+                    songMp3Input.value = data.result.download_url || '';
+                    songThumbnailInput.value = data.result.cover || '';
+                    songReleaseDateInput.value = data.result.releaseDate || '';
                     
-                    if (zenData.data.download) {
-                        await calculateDuration(zenData.data.download);
+                    if (data.result.download_url) {
+                        await calculateDuration(data.result.download_url);
                     }
                     
                     showNotification('Spotify song data fetched successfully!', 'success');
                     
-                    // Upload to catbox.moe
+                    // Upload ke catbox.moe (opsional)
                     showNotification('Uploading to catbox.moe...', '');
-                    const catboxUrl = await uploadToCatbox(zenData.data.download);
+                    const catboxUrl = await uploadToCatbox(data.result.download_url);
                     if (catboxUrl) {
                         songMp3Input.value = catboxUrl;
                         showNotification('MP3 uploaded to catbox.moe!', 'success');
@@ -1132,28 +1118,7 @@
                         showNotification('Using original MP3 URL (catbox upload failed)', 'error');
                     }
                 } else {
-                    // Fallback to zenzxz data if original API fails
-                    songTitleInput.value = zenData.data.title || '';
-                    songArtistInput.value = zenData.data.artist || '';
-                    songMp3Input.value = zenData.data.download || '';
-                    songThumbnailInput.value = zenData.data.image || '';
-                    songReleaseDateInput.value = '';
-                    
-                    if (zenData.data.download) {
-                        await calculateDuration(zenData.data.download);
-                    }
-                    
-                    showNotification('Spotify song data fetched (partial data)', 'success');
-                    
-                    // Upload to catbox.moe
-                    showNotification('Uploading to catbox.moe...', '');
-                    const catboxUrl = await uploadToCatbox(zenData.data.download);
-                    if (catboxUrl) {
-                        songMp3Input.value = catboxUrl;
-                        showNotification('MP3 uploaded to catbox.moe!', 'success');
-                    } else {
-                        showNotification('Using original MP3 URL (catbox upload failed)', 'error');
-                    }
+                    throw new Error('Invalid response from Flow Falcon API');
                 }
             } catch (error) {
                 console.error("Error fetching Spotify data:", error);
