@@ -280,30 +280,6 @@
             opacity: 0.9;
         }
 
-        .volume-control {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            width: 100%;
-            max-width: 200px;
-        }
-
-        .volume-slider {
-            flex-grow: 1;
-            height: 4px;
-            background-color: var(--control-bg);
-            border-radius: 2px;
-            cursor: pointer;
-        }
-
-        .volume-slider::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            width: 12px;
-            height: 12px;
-            background-color: var(--primary-color);
-            border-radius: 50%;
-        }
-
         .music-list {
             flex: 1;
             background-color: var(--card-bg);
@@ -1105,37 +1081,114 @@
         // --- Spotify Integration ---
         async function fetchSpotifyData(spotifyUrl) {
             spotifyLoading.style.display = 'block';
+            fetchSpotifyBtn.disabled = true;
             
             try {
-                const apiUrl = `https://flowfalcon.dpdns.org/download/spotify?url=${encodeURIComponent(spotifyUrl)}`;
-                const response = await fetch(apiUrl);
+                // First fetch from zenzxz API to get the download URL
+                const zenApiUrl = `https://zenzxz.dpdns.org/downloader/spotify?url=${encodeURIComponent(spotifyUrl)}`;
+                const zenResponse = await fetch(zenApiUrl);
                 
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                if (!zenResponse.ok) {
+                    throw new Error(`HTTP error! status: ${zenResponse.status}`);
                 }
                 
-                const data = await response.json();
+                const zenData = await zenResponse.json();
                 
-                if (data.status && data.result) {
-                    songTitleInput.value = data.result.title || '';
-                    songArtistInput.value = data.result.artist || '';
-                    songMp3Input.value = data.result.download_url || '';
-                    songThumbnailInput.value = data.result.cover || '';
-                    songReleaseDateInput.value = data.result.releaseDate || '';
+                if (!zenData.status || !zenData.data || !zenData.data.download) {
+                    throw new Error('Invalid response from zenzxz API');
+                }
+                
+                // Then fetch from original API to get other metadata
+                const originalApiUrl = `https://flowfalcon.dpdns.org/download/spotify?url=${encodeURIComponent(spotifyUrl)}`;
+                const originalResponse = await fetch(originalApiUrl);
+                
+                if (!originalResponse.ok) {
+                    throw new Error(`HTTP error! status: ${originalResponse.status}`);
+                }
+                
+                const originalData = await originalResponse.json();
+                
+                if (originalData.status && originalData.result) {
+                    // Combine data from both APIs
+                    songTitleInput.value = originalData.result.title || zenData.data.title || '';
+                    songArtistInput.value = originalData.result.artist || zenData.data.artist || '';
+                    songMp3Input.value = zenData.data.download || ''; // Use download URL from zenzxz
+                    songThumbnailInput.value = originalData.result.cover || zenData.data.image || '';
+                    songReleaseDateInput.value = originalData.result.releaseDate || '';
                     
-                    if (data.result.download_url) {
-                        await calculateDuration(data.result.download_url);
+                    if (zenData.data.download) {
+                        await calculateDuration(zenData.data.download);
                     }
                     
                     showNotification('Spotify song data fetched successfully!', 'success');
+                    
+                    // Upload to catbox.moe
+                    showNotification('Uploading to catbox.moe...', '');
+                    const catboxUrl = await uploadToCatbox(zenData.data.download);
+                    if (catboxUrl) {
+                        songMp3Input.value = catboxUrl;
+                        showNotification('MP3 uploaded to catbox.moe!', 'success');
+                    } else {
+                        showNotification('Using original MP3 URL (catbox upload failed)', 'error');
+                    }
                 } else {
-                    throw new Error('Invalid response from Spotify API');
+                    // Fallback to zenzxz data if original API fails
+                    songTitleInput.value = zenData.data.title || '';
+                    songArtistInput.value = zenData.data.artist || '';
+                    songMp3Input.value = zenData.data.download || '';
+                    songThumbnailInput.value = zenData.data.image || '';
+                    songReleaseDateInput.value = '';
+                    
+                    if (zenData.data.download) {
+                        await calculateDuration(zenData.data.download);
+                    }
+                    
+                    showNotification('Spotify song data fetched (partial data)', 'success');
+                    
+                    // Upload to catbox.moe
+                    showNotification('Uploading to catbox.moe...', '');
+                    const catboxUrl = await uploadToCatbox(zenData.data.download);
+                    if (catboxUrl) {
+                        songMp3Input.value = catboxUrl;
+                        showNotification('MP3 uploaded to catbox.moe!', 'success');
+                    } else {
+                        showNotification('Using original MP3 URL (catbox upload failed)', 'error');
+                    }
                 }
             } catch (error) {
                 console.error("Error fetching Spotify data:", error);
                 showNotification('Failed to fetch song from Spotify. Please check the link and try again.', 'error');
             } finally {
                 spotifyLoading.style.display = 'none';
+                fetchSpotifyBtn.disabled = false;
+            }
+        }
+
+        // Function to upload to catbox.moe
+        async function uploadToCatbox(downloadUrl) {
+            try {
+                // First download the file
+                const response = await fetch(downloadUrl);
+                if (!response.ok) throw new Error('Failed to download file');
+                
+                const blob = await response.blob();
+                const formData = new FormData();
+                formData.append('fileToUpload', blob, 'song.mp3');
+                formData.append('reqtype', 'fileupload');
+                
+                // Upload to catbox.moe
+                const uploadResponse = await fetch('https://catbox.moe/user/api.php', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                if (!uploadResponse.ok) throw new Error('Upload failed');
+                
+                const catboxUrl = await uploadResponse.text();
+                return catboxUrl;
+            } catch (error) {
+                console.error("Error uploading to catbox:", error);
+                return null;
             }
         }
 
