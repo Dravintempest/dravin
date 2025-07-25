@@ -1060,8 +1060,7 @@
                 <input type="text" id="searchInputHome" placeholder="Search song or artist...">
             </div>
             <div id="allSongsListHome" class="music-list-container">
-                <!-- Songs will be rendered here -->
-            </div>
+                </div>
         </div>
 
         <div id="playlistContent" class="content-section">
@@ -1072,8 +1071,7 @@
                 </button>
             </div>
             <div id="playlistsGrid" class="playlist-grid">
-                <!-- Playlists will be rendered here -->
-            </div>
+                </div>
             <div id="emptyPlaylistsState" class="empty-state" style="display: none;">
                 <i class="fas fa-compact-disc" style="font-size: 3rem; margin-bottom: 15px;"></i>
                 <h3>You don't have any playlists yet</h3>
@@ -1146,7 +1144,6 @@
         </a>
     </div>
 
-    <!-- Full Screen Player -->
     <div id="fullScreenPlayerModal" class="full-screen-player-modal">
         <div class="full-screen-player-header">
             <button class="close-full-screen-player" id="closeFullScreenPlayerBtn" tabindex="0">
@@ -1190,13 +1187,10 @@
         </button>
     </div>
 
-    <!-- Audio Player -->
     <audio id="audioPlayer"></audio>
 
-    <!-- Toast Notification -->
     <div id="toast"></div>
 
-    <!-- Playlist Form Modal -->
     <div id="playlistFormModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -1225,7 +1219,6 @@
         </div>
     </div>
 
-    <!-- Edit Playlist Modal -->
     <div id="editPlaylistModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -1254,7 +1247,6 @@
         </div>
     </div>
 
-    <!-- Confirmation Modal -->
     <div id="confirmationModal" class="modal">
         <div class="modal-content" style="max-width: 400px; text-align: center;">
             <div class="modal-header" style="justify-content: center; border-bottom: none;">
@@ -1268,7 +1260,6 @@
         </div>
     </div>
 
-    <!-- Playlist Detail Modal -->
     <div id="playlistDetailModal" class="modal">
         <div class="modal-content">
             <div class="modal-header" style="border-bottom: none;">
@@ -1305,7 +1296,6 @@
         </div>
     </div>
 
-    <!-- Add Songs to Playlist Modal -->
     <div id="addSongsToPlaylistModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
@@ -1317,15 +1307,36 @@
                 <input type="text" id="addSongsSearchInput" placeholder="Search songs to add..." tabindex="0">
             </div>
             <div class="music-list-container" id="allSongsForAddingList">
-                <!-- Songs for adding will be rendered here -->
-            </div>
+                </div>
             <div class="modal-footer" style="margin-top: 20px; text-align: right;">
                 <button class="btn" id="saveAddedSongsBtn" tabindex="0">Done</button>
             </div>
         </div>
     </div>
 
-    <script>
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-analytics.js";
+        // If you need other Firebase services, import them here, e.g.:
+        // import { getFirestore } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
+        // import { getStorage } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-storage.js";
+
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBZlwyceAWIS_D92KqlAr_QVcGuNP8cZBY",
+            authDomain: "dravin-music123.firebaseapp.com",
+            projectId: "dravin-music123",
+            storageBucket: "dravin-music123.firebasestorage.app",
+            messagingSenderId: "857980385054",
+            appId: "1:857980385054:web:78567069dbf8858c023b0f",
+            measurementId: "G-22W8556KXD"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const analytics = getAnalytics(app);
+
         // --- DOM Elements ---
         const homeTab = document.getElementById('homeTab');
         const playlistTab = document.getElementById('playlistTab');
